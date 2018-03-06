@@ -16,13 +16,16 @@ DEFINES += USING_PCH
 
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+    eventcontroller.cpp
 
 HEADERS += \
     extinclusions.hpp \
     allinclusions.hpp \
     allinclusions.hpp \
-    extinclusions.hpp
+    extinclusions.hpp \
+    eventcontroller.hpp \
+    utilities.hpp
 
 PRECOMPILED_HEADER += extinclusions.hpp
 

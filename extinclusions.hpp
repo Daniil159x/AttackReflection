@@ -1,4 +1,6 @@
-﻿#ifndef EXTINCLUSIONS_HPP
+﻿// UTF-8 BOM
+
+#ifndef EXTINCLUSIONS_HPP
 #define EXTINCLUSIONS_HPP
 
 /**
@@ -14,12 +16,16 @@
 #include <mutex>
 #include <chrono>
 #include <vector>
+#include <unordered_map>
+#include <functional>
 //#include <random>
 
 
 /// BOOST
-#define BOOST_ENABLE_ASSERT_DEBUG_HANDLER
+//#define BOOST_ENABLE_ASSERT_DEBUG_HANDLER
 #include <boost/assert.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/current_function.hpp>
 
 
 /// SFML

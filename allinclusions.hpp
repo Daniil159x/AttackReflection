@@ -1,4 +1,6 @@
-﻿#ifndef ALLINCLUSIONS_HPP
+﻿// UTF-8 BOM
+
+#ifndef ALLINCLUSIONS_HPP
 #define ALLINCLUSIONS_HPP
 
 /**
@@ -15,5 +17,8 @@
 #include "extinclusions.hpp"
 
 /// headers project
+#include "utilities.hpp"
+
+#include "eventcontroller.hpp"
 
 #endif // ALLINCLUSIONS_HPP
