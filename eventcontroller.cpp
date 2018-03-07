@@ -57,7 +57,7 @@ void EventController::StartListeningSync() noexcept
 
                 int idEv = CreateNumber(ev.type, GetSubEvent__(ev));
 
-                std::cout << "Event = " << idEv << std::endl;
+//                std::cout << "Event = " << idEv << std::endl;
 
                 auto &&it = m_mapCall.find(idEv);
 
@@ -80,7 +80,7 @@ void EventController::StartListeningSync() noexcept
             else {
                 ++repeatErrors;
                 if(repeatErrors >= 10){
-                    std::cout << "EventController loop ended with errors" << std::endl;
+                    sf::err() << "EventController loop ended with errors" << std::endl;
                     break;
                 }
                 // TODO: error log
@@ -88,7 +88,7 @@ void EventController::StartListeningSync() noexcept
         }
 
         m_isRun = false;
-        std::cout << "End loop EventController" << std::endl;
+        sf::err() << "End loop EventController" << std::endl;
     }
 }
 

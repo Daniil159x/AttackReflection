@@ -17,7 +17,9 @@ DEFINES += USING_PCH
 
 SOURCES += \
         main.cpp \
-    eventcontroller.cpp
+    eventcontroller.cpp \
+    game.cpp \
+    texturehelper.cpp
 
 HEADERS += \
     extinclusions.hpp \
@@ -25,7 +27,9 @@ HEADERS += \
     allinclusions.hpp \
     extinclusions.hpp \
     eventcontroller.hpp \
-    utilities.hpp
+    utilities.hpp \
+    game.hpp \
+    texturehelper.hpp
 
 PRECOMPILED_HEADER += extinclusions.hpp
 
@@ -35,3 +39,4 @@ INCLUDEPATH += /home/daniil/Dev/SFML-2.4.2/include
 LIBS += -L/home/daniil/Dev/SFML-2.4.2/lib/ -lsfml-graphics -lsfml-window -lsfml-system
 
 #   boost
+LIBS += -lboost_filesystem -lboost_system

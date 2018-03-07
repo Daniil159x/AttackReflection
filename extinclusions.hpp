@@ -18,6 +18,7 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <deque>
 //#include <random>
 
 
@@ -26,6 +27,7 @@
 #include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/current_function.hpp>
+#include <boost/filesystem.hpp>
 
 
 /// SFML

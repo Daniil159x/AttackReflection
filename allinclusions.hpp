@@ -19,6 +19,9 @@
 /// headers project
 #include "utilities.hpp"
 
+#include "texturehelper.hpp"
 #include "eventcontroller.hpp"
+
+#include "game.hpp"
 
 #endif // ALLINCLUSIONS_HPP

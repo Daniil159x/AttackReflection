@@ -3,7 +3,7 @@
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 
-#include "extinclusions.hpp"
+#include "allinclusions.hpp"
 
 constexpr int gcd(int f, int s){
     BOOST_ASSERT(f > 0 && s > 0);

@@ -3,7 +3,7 @@
 #ifndef EVENTCONTROLLER_HPP
 #define EVENTCONTROLLER_HPP
 
-#include "extinclusions.hpp"
+#include "allinclusions.hpp"
 
 using WinPtr_t   = std::shared_ptr<sf::Window>;
 
