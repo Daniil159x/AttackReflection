@@ -63,23 +63,22 @@ const sf::Texture &TextureHelper::GetTexture() noexcept
 
 const sf::IntRect &TextureHelper::GetRectBy(size_t id) const
 {
-    return m_frames.at(id);
+    return m_frames.at(id - 1);
 }
 
 sf::IntRect TextureHelper::GetRectByWithOffset(size_t id, sf::IntRect rect) const
 {
-    auto &&r = m_frames.at(id);;
+    auto &&r = m_frames.at(id - 1);
     rect.left += r.left;
     rect.top  += r.top;
-    rect.width  = r.width;
-    rect.height = r.height;
+
     return rect;
 }
 
 sf::Color TextureHelper::GetPixel(uint x, uint y) const
 {
-    if(x < m_mainImages.getSize().x && y < m_mainImages.getSize().y){
-        throw std::out_of_range(BOOST_STRINGIZE(BOOST_CURRENT_FUNCTION));
+    if(!(x < m_mainImages.getSize().x && y < m_mainImages.getSize().y)){
+        throw std::out_of_range(BOOST_CURRENT_FUNCTION + std::string(": ") + std::to_string(x) + ", " + std::to_string(y));
     }
     return m_mainImages.getPixel(x, y);
 }

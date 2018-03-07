@@ -26,4 +26,10 @@ constexpr int lcm(int f, int s){
 }
 
 
+class TextureHelper;
+namespace Collision {
+    bool PixelPerfectTest(const sf::Sprite& obj_1, const sf::Sprite& obj_2, TextureHelper const& helper, sf::Uint8 AlphaLimit = 127);
+}
+
+
 #endif // UTILITIES_HPP

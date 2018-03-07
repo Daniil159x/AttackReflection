@@ -19,7 +19,8 @@ SOURCES += \
         main.cpp \
     eventcontroller.cpp \
     game.cpp \
-    texturehelper.cpp
+    texturehelper.cpp \
+    utilities.cpp
 
 HEADERS += \
     extinclusions.hpp \
