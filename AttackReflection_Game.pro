@@ -20,7 +20,10 @@ SOURCES += \
     eventcontroller.cpp \
     game.cpp \
     texturehelper.cpp \
-    utilities.cpp
+    utilities.cpp \
+    mob.cpp \
+    disappearing.cpp \
+    bullet.cpp
 
 HEADERS += \
     extinclusions.hpp \
@@ -30,7 +33,10 @@ HEADERS += \
     eventcontroller.hpp \
     utilities.hpp \
     game.hpp \
-    texturehelper.hpp
+    texturehelper.hpp \
+    mob.hpp \
+    disappearing.hpp \
+    bullet.hpp
 
 PRECOMPILED_HEADER += extinclusions.hpp
 

@@ -50,6 +50,9 @@ public:
     bool ConnectCallback(const callback_t &foo, int idEvent) noexcept;
     bool ConnectCallback(const callback_t &foo, sf::Event::EventType mainEv, int subEv = -1) noexcept;
 
+    bool DisconnectCallback(int idEvent) noexcept;
+    bool DisconnectCallback(sf::Event::EventType mainEv, int subEv = -1) noexcept;
+
     /**
       @brief StartListeningAsync
      */

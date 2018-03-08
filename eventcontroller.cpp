@@ -7,6 +7,7 @@ EventController::EventController(const WinPtr_t &win) : m_pWin(win)
     m_mapCall[ CreateNumber(sf::Event::Closed) ] = [&](sf::Event ev){
         this->CloseWindow__(ev);
     };
+    m_pWin->setKeyRepeatEnabled(false);
 }
 
 EventController::EventController(EventController &&other)
@@ -36,6 +37,18 @@ bool EventController::ConnectCallback(const EventController::callback_t &foo, sf
     return ConnectCallback(foo, CreateNumber(mainEv, subEv));
 }
 
+bool EventController::DisconnectCallback(int idEvent) noexcept
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    return !!m_mapCall.erase(idEvent);
+}
+
+bool EventController::DisconnectCallback(sf::Event::EventType mainEv, int subEv) noexcept
+{
+    return DisconnectCallback(CreateNumber(mainEv, subEv));
+}
+
 void EventController::StartListeningAsync() noexcept
 {
     if(!m_isRun) {
@@ -52,6 +65,7 @@ void EventController::StartListeningSync() noexcept
         uint8_t repeatErrors = 0;
         while(m_pWin->isOpen() && m_isRun){
             // TODO: приложение остановится не сразу, так как должно наступить какое то событие
+            // TODO: приделать проверку зажатий клавиш
             if(m_pWin->waitEvent(ev) && m_isRun){
                 std::unique_lock<std::mutex> lock(m_mutex);
 
