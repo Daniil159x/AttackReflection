@@ -49,6 +49,25 @@ bool EventController::DisconnectCallback(sf::Event::EventType mainEv, int subEv)
     return DisconnectCallback(CreateNumber(mainEv, subEv));
 }
 
+bool EventController::RegisterButton(const Button_ptr &but, EventController::EventButtom_t ev,
+                                     const EventController::callbackButton_t &foo) noexcept
+{
+    m_arrButtons[ev].push_back({but, foo});
+    return true;
+}
+
+bool EventController::UnregisterButton(const Button_ptr &but, EventController::EventButtom_t ev) noexcept
+{
+    auto & el = m_arrButtons[ev];
+    for(auto &&it = el.begin(); it != el.end(); ++it){
+        if(it->pBtn == but){
+            el.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
 void EventController::StartListeningAsync() noexcept
 {
     if(!m_isRun) {
@@ -69,9 +88,27 @@ void EventController::StartListeningSync() noexcept
             if(m_pWin->waitEvent(ev) && m_isRun){
                 std::unique_lock<std::mutex> lock(m_mutex);
 
-                int idEv = CreateNumber(ev.type, GetSubEvent__(ev));
+                auto &&btnEv = SFMLEventToEventButtom__(ev);
 
-//                std::cout << "Event = " << idEv << std::endl;
+                if(btnEv != EventButtom_t::Count){
+                    for(auto && [btn, call] : m_arrButtons[EventButtom_t::All]){
+                        if(btn->getGlobalBounds().contains(ev.mouseButton.x, ev.mouseButton.y)){
+                            lock.unlock();
+                            call(EventButtom_t::All);
+                            lock.lock();
+                        }
+                    }
+
+                    for(auto && [btn, call] : m_arrButtons[btnEv]){
+                        if(btn->getGlobalBounds().contains(ev.mouseButton.x, ev.mouseButton.y)){
+                            lock.unlock();
+                            call(btnEv);
+                            lock.lock();
+                        }
+                    }
+                }
+
+                int idEv = CreateNumber(ev.type, GetSubEvent__(ev));
 
                 auto &&it = m_mapCall.find(idEv);
 
@@ -147,5 +184,17 @@ int EventController::GetSubEvent__(const sf::Event &ev) const noexcept
 
     default:
         return -1;
+    }
+}
+
+EventController::EventButtom_t EventController::SFMLEventToEventButtom__(const sf::Event &ev) const noexcept
+{
+    switch (ev.type) {
+    case sf::Event::MouseButtonPressed:
+        return EventButtom_t::Pressed;
+    case sf::Event::MouseButtonReleased:
+        return EventButtom_t::Released;
+    default:
+        return EventButtom_t::Count;
     }
 }

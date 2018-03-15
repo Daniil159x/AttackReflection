@@ -23,7 +23,8 @@ SOURCES += \
     utilities.cpp \
     mob.cpp \
     disappearing.cpp \
-    bullet.cpp
+    bullet.cpp \
+    button.cpp
 
 HEADERS += \
     extinclusions.hpp \
@@ -36,7 +37,8 @@ HEADERS += \
     texturehelper.hpp \
     mob.hpp \
     disappearing.hpp \
-    bullet.hpp
+    bullet.hpp \
+    button.hpp
 
 PRECOMPILED_HEADER += extinclusions.hpp
 

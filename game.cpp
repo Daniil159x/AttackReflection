@@ -8,12 +8,53 @@ Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFulls
 {
     m_pWin->setFramerateLimit(60);
     m_pWin->setKeyRepeatEnabled(false);
+
+    m_events.ConnectCallback([&](sf::Event ev){
+        BOOST_ASSERT(ev.type == sf::Event::Closed);
+        m_pWin->close();
+    }, sf::Event::Closed);
 }
 
 void Game::Init() noexcept
 {
-    // TODO: загрузка текстур
-    // TODO: регистация кнопок
+}
+
+void Game::ShowMenu() noexcept
+{
+    uint CSize = GetCharacterSize__();
+
+    if(!m_buttons[0]) {
+        m_buttons[0] = std::make_shared<Button>("Start Game");
+        m_buttons[0]->GetBackground().setFillColor(sf::Color::Red);
+    }
+    if(!m_buttons[1]) {
+        m_buttons[1] = std::make_shared<Button>("<Not>");
+        m_buttons[1]->GetBackground().setFillColor(sf::Color::Cyan);
+    }
+    if(!m_buttons[2]) {
+        m_buttons[2] = std::make_shared<Button>("Exit");
+        m_buttons[2]->GetBackground().setFillColor(sf::Color::Red);
+    }
+
+    sf::Vector2f winSize(m_pWin->getSize());
+    for(size_t i = 0; i < m_buttons.size(); ++i)
+    {
+        auto &&btn = m_buttons[i];
+
+        auto btn_w = btn->GetText().getGlobalBounds().width;
+        auto btn_h = btn->GetText().getGlobalBounds().height;
+
+        auto tCenter = sf::Vector2f(
+                 winSize.x / 2,
+                (winSize.y / 3) * (i + 1) - winSize.y / 6);
+
+        tCenter.x -= btn_w / 2;
+        tCenter.y -= btn_h / 2;
+
+        btn->GetText().setPosition(tCenter);
+        btn->GetText().setCharacterSize(CSize);
+        btn->UpdateBackground();
+    }
 }
 
 void Game::ShowField() noexcept
@@ -112,4 +153,9 @@ void Game::Display() noexcept
 void Game::Render__() noexcept
 {
     // TODO: добавить рендер
+}
+
+uint Game::GetCharacterSize__() const noexcept
+{
+    return 40;
 }

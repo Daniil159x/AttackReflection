@@ -8,9 +8,8 @@
 class Bullet : public Disappearing
 {
 public:
+    Bullet();
     Bullet(const sf::Texture& texture, const sf::IntRect& rectangle, uint8_t dmg, uint8_t lvls = 1);
-
-    inline static float TargetRotate(sf::Vector2f const &from, sf::Vector2f const &to);
 
     // TODO: добавить физику
 

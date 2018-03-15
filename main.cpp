@@ -7,45 +7,47 @@ using namespace std::chrono_literals;
 
 int main()
 {
-
-    TextureHelper th;
-    th.Load("../../test.png");
-    th.MergeTexture();
-    auto &&t = th.GetTexture();
-
-    sf::Sprite red(t, th.GetRectByWithOffset(1, {8, 7, 15, 36}));
-    sf::Sprite blue(t, th.GetRectByWithOffset(1, {29, 14, 18, 20}));
-
-    red.scale(3, 3);
-    blue.scale(3, 3);
-
-    red.setPosition(90, 90);
+    Button::GlobalFontInit();
 
     auto &&pWin = std::make_shared<sf::RenderWindow>(sf::VideoMode(1000, 700), "Test", sf::Style::Close);
     EventController Evc(pWin);
 
     pWin->setFramerateLimit(30);
 
-    Evc.ConnectCallback([&](sf::Event e){
-        auto &spr = (e.key.control) ? blue : red;
+    auto pBtn = std::make_shared<Button>("Text");
+    pBtn->GetBackground().setFillColor(sf::Color::Red);
+    pBtn->GetText().setPosition(50, 50);
+    pBtn->GetText().setCharacterSize(50);
+    pBtn->UpdateBackground({20, 20});
 
-        const float mvOne = 2.f;
-        float mvX = mvOne * (e.key.code == sf::Keyboard::Right) - mvOne * (e.key.code == sf::Keyboard::Left);
-        float mvY = mvOne * (e.key.code == sf::Keyboard::Down) - mvOne * (e.key.code == sf::Keyboard::Up);
+    Evc.RegisterButton(pBtn, EventController::Released, [&](auto ev){
+        std::cout << "Released" << std::endl;
+    });
 
-        spr.move(mvX, mvY);
+    Evc.RegisterButton(pBtn, EventController::Pressed, [&](auto ev){
+        std::cout << "Press" << std::endl;
+    });
 
-    }, sf::Event::KeyPressed);
+//    Evc.ConnectCallback([&](sf::Event ev){
+//        auto r = CalculateRotate(pBtn->GetText().getOrigin(),
+//        { static_cast<float>(ev.mouseMove.x), static_cast<float>(ev.mouseMove.y) });
+
+//        std::cout << "calc = " << r << std::endl;
+//        pBtn->GetText().setRotation( r );
+//        pBtn->UpdateBackground();
+//    }, sf::Event::MouseMoved);
+
+    Evc.ConnectCallback([&](sf::Event ev){
+        std::cout << sf::Mouse::getPosition(*pWin).x << " " << sf::Mouse::getPosition(*pWin).y << std::endl;
+        std::cout << "pos " << pBtn->GetText().getPosition().x << " " << pBtn->GetText().getPosition().y << std::endl;
+    }, sf::Event::MouseButtonReleased, sf::Mouse::Left);
+
 
     std::thread([&](){
         while(pWin->isOpen()){
             pWin->clear(sf::Color::Magenta);
-            pWin->draw(red);
-            pWin->draw(blue);
 
-            if(Collision::PixelPerfectTest(red, blue, th)){
-                std::cout << "Collision" << std::endl;
-            }
+            pWin->draw(*pBtn);
 
             pWin->display();
         }

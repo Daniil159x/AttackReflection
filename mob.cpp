@@ -3,6 +3,9 @@
 #include "allinclusions.hpp"
 
 
+Mob::Mob()
+{}
+
 Mob::Mob(const sf::Texture &texture, const sf::IntRect &rectangle, int8_t hp, uint8_t lvls)
     : Disappearing (texture, rectangle, lvls), m_hp(hp)
 {}

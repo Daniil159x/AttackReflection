@@ -9,6 +9,7 @@
 class Mob : public Disappearing
 {
 public:
+    Mob();
     Mob(const sf::Texture& texture, const sf::IntRect& rectangle, int8_t hp = 100, uint8_t lvls = 1);
 
     inline void SetHP(int8_t hp) noexcept;

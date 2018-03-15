@@ -28,6 +28,7 @@ public:
 //    void Stop();
     void Pause() noexcept;
 private:
+    // service
     WinPtr_t        m_pWin;
     EventController m_events;
     TextureHelper   m_txrHelper;
@@ -39,6 +40,10 @@ private:
         Finish
     } m_stageGame = stage_t::Nope;
 
+    // menu
+    std::array<Button_ptr, 3> m_buttons;
+
+    // game loop
     Mob m_player;
     sf::Vector2i m_posCursor;
     sf::Vector2u m_posShots;
@@ -50,6 +55,8 @@ private:
     void Update__() noexcept;
 
     void Render__() noexcept;
+
+    uint GetCharacterSize__() const noexcept;
 };
 
 #endif // GAME_HPP

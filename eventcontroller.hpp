@@ -13,7 +13,15 @@ using WinPtr_t   = std::shared_ptr<sf::Window>;
 class EventController : boost::noncopyable
 {
 public:
-    using callback_t = std::function<void(sf::Event)>;
+    enum EventButtom_t {
+        All, Pressed, Released, //Click, DoubleClick,
+        // TODO: добавить типа кнопки
+        Count
+    };
+
+    using callback_t       = std::function<void(sf::Event)>;
+    using callbackButton_t = std::function<void(EventButtom_t)>;
+
 
     /**
       @brief Constructor
@@ -53,6 +61,9 @@ public:
     bool DisconnectCallback(int idEvent) noexcept;
     bool DisconnectCallback(sf::Event::EventType mainEv, int subEv = -1) noexcept;
 
+    bool RegisterButton(const Button_ptr &but, EventButtom_t ev, callbackButton_t const &foo) noexcept;
+    bool UnregisterButton(const Button_ptr &but, EventButtom_t ev) noexcept;
+
     /**
       @brief StartListeningAsync
      */
@@ -71,8 +82,16 @@ public:
     ~EventController() noexcept;
 
 private:
+    struct ButtonMeta
+    {
+
+        Button_ptr       pBtn;
+        callbackButton_t foo;
+    };
+
     WinPtr_t m_pWin;
     std::unordered_map<int, callback_t> m_mapCall;
+    std::array<std::vector<ButtonMeta>, EventButtom_t::Count> m_arrButtons;
     std::mutex m_mutex;
     bool m_isRun = false;
 
@@ -81,6 +100,8 @@ private:
 
     /// returns sub event if it has, else returns -1
     int GetSubEvent__(const sf::Event &ev) const noexcept;
+
+    EventButtom_t SFMLEventToEventButtom__(const sf::Event &ev) const noexcept;
 };
 
 template <class ...Args>

@@ -19,12 +19,15 @@
 /// headers project
 #include "utilities.hpp"
 
-#include "texturehelper.hpp"
-#include "eventcontroller.hpp"
-
 #include "disappearing.hpp"
 #include "mob.hpp"
 #include "bullet.hpp"
+#include "button.hpp"
+
+#include "texturehelper.hpp"
+#include "eventcontroller.hpp"
+
+
 #include "game.hpp"
 
 #endif // ALLINCLUSIONS_HPP
