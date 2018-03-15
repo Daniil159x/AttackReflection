@@ -5,7 +5,7 @@
 
 #include "allinclusions.hpp"
 
-using WinPtr_t   = std::shared_ptr<sf::Window>;
+using WinPtr_t   = std::shared_ptr<sf::RenderWindow>;
 
 /**
     @brief The class management window events.
@@ -90,7 +90,7 @@ private:
     };
 
     WinPtr_t m_pWin;
-    std::unordered_map<int, callback_t> m_mapCall;
+    std::unordered_multimap<int, callback_t> m_mapCall;
     std::array<std::vector<ButtonMeta>, EventButtom_t::Count> m_arrButtons;
     std::mutex m_mutex;
     bool m_isRun = false;

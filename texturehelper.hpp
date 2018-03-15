@@ -7,12 +7,13 @@
 #include "allinclusions.hpp"
 
 // класс абстрогирующий загрузку текстур и доступ к пикселям текстур
+// TODO: добавить компановку
 class TextureHelper
 {
 public:
     TextureHelper();
     // загрузить текстуру в память, возвращает id изображения
-    size_t Load(boost::filesystem::path const &file) noexcept;
+    size_t Load(boost::filesystem::path const &file, uint8_t repeat = 1) noexcept;
     // создаёт единую текстуру
     void MergeTexture() noexcept;
     // выдать текстуру, если текстура не создана, то создаётся

@@ -6,16 +6,27 @@
 TextureHelper::TextureHelper() : m_tmpSize(0, 0)
 {}
 
-size_t TextureHelper::Load(const boost::filesystem::path &file) noexcept
+size_t TextureHelper::Load(const boost::filesystem::path &file, uint8_t repeat) noexcept
 {
-    m_tmp.push_back({});
-    auto& img = m_tmp.back();
-    if(!img.loadFromFile(file.generic_string())){
-        m_tmp.pop_back();
+    sf::Image img_loaded;
+    if(!img_loaded.loadFromFile(file.generic_string())){
         return 0;
     }
-    m_tmpSize.x += img.getSize().x;
-    m_tmpSize.y = std::max(m_tmpSize.y, img.getSize().y);
+
+    m_tmp.push_back({});
+    auto &img_res = m_tmp.back();
+
+    auto w = img_loaded.getSize().x;
+    auto h = img_loaded.getSize().y;
+
+    img_res.create(w * repeat, h, sf::Color::Transparent);
+    for(uint8_t i = 0; i < repeat; ++i){
+        img_res.copy(img_loaded, w * i, 0);
+    }
+
+
+    m_tmpSize.x += img_res.getSize().x;
+    m_tmpSize.y = std::max(m_tmpSize.y, img_res.getSize().y);
 
     return m_tmp.size() + m_frames.size();
 }

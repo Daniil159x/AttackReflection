@@ -4,9 +4,10 @@
 
 EventController::EventController(const WinPtr_t &win) : m_pWin(win)
 {
-    m_mapCall[ CreateNumber(sf::Event::Closed) ] = [&](sf::Event ev){
-        this->CloseWindow__(ev);
-    };
+    m_mapCall.insert({CreateNumber(sf::Event::Closed),
+                      [&](sf::Event ev){
+                          this->CloseWindow__(ev);
+                      }});
     m_pWin->setKeyRepeatEnabled(false);
 }
 
@@ -27,7 +28,7 @@ bool EventController::ConnectCallback(const EventController::callback_t &foo, in
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    m_mapCall.insert_or_assign(idEvent, foo);
+    m_mapCall.insert({idEvent, foo});
 
     return true;
 }
@@ -86,47 +87,58 @@ void EventController::StartListeningSync() noexcept
             // TODO: приложение остановится не сразу, так как должно наступить какое то событие
             // TODO: приделать проверку зажатий клавиш
             if(m_pWin->waitEvent(ev) && m_isRun){
+//                auto now = std::chrono::system_clock::now();
                 std::unique_lock<std::mutex> lock(m_mutex);
 
                 auto &&btnEv = SFMLEventToEventButtom__(ev);
 
                 if(btnEv != EventButtom_t::Count){
+                    bool hasCall = false;
+                    // All
                     for(auto && [btn, call] : m_arrButtons[EventButtom_t::All]){
                         if(btn->getGlobalBounds().contains(ev.mouseButton.x, ev.mouseButton.y)){
                             lock.unlock();
                             call(EventButtom_t::All);
+                            hasCall = true;
                             lock.lock();
                         }
                     }
 
+                    // target
                     for(auto && [btn, call] : m_arrButtons[btnEv]){
                         if(btn->getGlobalBounds().contains(ev.mouseButton.x, ev.mouseButton.y)){
                             lock.unlock();
                             call(btnEv);
+                            hasCall = true;
                             lock.lock();
                         }
+                    }
+                    if(hasCall){
+                        continue;
                     }
                 }
 
                 int idEv = CreateNumber(ev.type, GetSubEvent__(ev));
+                auto &&range = m_mapCall.equal_range(idEv);
+                for(auto &&it = range.first; it != range.second; ++it){
+                    lock.unlock();
+                    it->second(ev);
+                    lock.lock();
+                }
 
-                auto &&it = m_mapCall.find(idEv);
-
-                if(it == m_mapCall.end()){
-
-                    idEv = CreateNumber(ev.type);
-                    it = m_mapCall.find(idEv);
-
-                    if(it != m_mapCall.end()){
-                        lock.unlock(); // TODO: скорее костыль, надо через рекурсивный mutex
-                        it->second.operator()(ev);
+                int idEvWithoutSub = CreateNumber(ev.type);
+                if(idEvWithoutSub != idEv){
+                    auto &&range = m_mapCall.equal_range(idEvWithoutSub);
+                    for(auto &&it = range.first; it != range.second; ++it){
+                        lock.unlock();
+                        it->second(ev);
+                        lock.lock();
                     }
                 }
-                else if(m_isRun){
-                    lock.unlock(); // TODO: скорее костыль, надо через рекурсивный mutex
-                    it->second.operator()(ev);
-                }
+
                 repeatErrors = 0;
+
+//                std::cout << std::chrono::duration_cast<std::chrono::microseconds>((std::chrono::system_clock::now() - now)).count() << "micro\n" << std::endl;
             }
             else {
                 ++repeatErrors;

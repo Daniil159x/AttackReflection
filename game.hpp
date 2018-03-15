@@ -33,20 +33,34 @@ private:
     EventController m_events;
     TextureHelper   m_txrHelper;
     enum stage_t {
+        /// ничего
         Nope,
+        /// меню
         Menu,
+        /// вход в поле игры
         Launch,
+        /// в поле игры
         InGame,
+        /// выход из поля игры
         Finish
     } m_stageGame = stage_t::Nope;
+
+    // background
+    std::array<sf::Sprite, 3> m_background;
+    size_t m_skyIdx;
+    size_t m_forestIdx1;
+    size_t m_forestIdx2;
+
+    // mouse
+    sf::Vector2i m_oldPosCursor;
+    sf::Vector2i m_currPosCursor;
+    sf::Vector2i m_posShots;
 
     // menu
     std::array<Button_ptr, 3> m_buttons;
 
     // game loop
     Mob m_player;
-    sf::Vector2i m_posCursor;
-    sf::Vector2u m_posShots;
     // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
     std::deque<Mob> m_zombie;
     std::deque<Bullet> m_buttels;
@@ -54,9 +68,12 @@ private:
     template<stage_t st>
     void Update__() noexcept;
 
+    template<stage_t st>
     void Render__() noexcept;
 
     uint GetCharacterSize__() const noexcept;
+
+    float UpdateMoveBackground__() noexcept;
 };
 
 #endif // GAME_HPP
