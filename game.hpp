@@ -44,13 +44,11 @@ private:
         /// выход из поля игры
         Finish
     } m_stageGame = stage_t::Nope;
-    std::vector<sf::Texture> m_textures;
 
     // background
     std::array<sf::Sprite, 3> m_background;
-    size_t m_skyIdx;
-    size_t m_forestIdx1;
-    size_t m_forestIdx2;
+    sf::Texture m_skyTexture;
+    std::array<sf::Texture, 2> m_forestTexture;
 
     // mouse
     sf::Vector2i m_oldPosCursor;
@@ -60,8 +58,20 @@ private:
     // menu
     std::array<Button_ptr, 3> m_buttons;
 
+    // TODO: что то сделать с текстурами
     // game loop
     Mob m_player;
+    //      active
+    sf::Texture m_playerTexture;
+    sf::Texture m_zombieTexture;
+    sf::Texture m_buttelTexture;
+    //      map
+    sf::Texture m_pathTexture;
+    sf::Texture m_grassTexture;
+    sf::Texture m_timbersTexture;
+    sf::Sprite  m_path;
+    sf::Sprite  m_grass;
+    sf::Sprite  m_timbers;
     // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
     std::deque<Mob> m_zombie;
     std::deque<Bullet> m_buttels;

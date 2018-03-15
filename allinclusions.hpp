@@ -24,7 +24,6 @@
 #include "bullet.hpp"
 #include "button.hpp"
 
-#include "texturehelper.hpp"
 #include "eventcontroller.hpp"
 
 

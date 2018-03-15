@@ -2,11 +2,14 @@
 
 #include "allinclusions.hpp"
 
+#define ROOT_PATH "../../"
+
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
                                                         "Attack Reflection", sf::Style::Fullscreen)),
     m_events(m_pWin)
 {
-    m_pWin->setFramerateLimit(60);
+//    m_pWin->setFramerateLimit(60);
+    m_pWin->setVerticalSyncEnabled(true);
     m_pWin->setKeyRepeatEnabled(false);
 
 //    m_events.ConnectCallback([&](sf::Event ev){
@@ -28,7 +31,7 @@ void Game::Init() noexcept
 
     // start
     m_events.RegisterButton(m_buttons[0], EventController::EventButtom_t::Pressed, [&]([[maybe_unused]]  EventController::EventButtom_t ev){
-        m_stageGame = Launch;
+        ShowField();
     });
 
     // end
@@ -43,13 +46,33 @@ void Game::Init() noexcept
         m_currPosCursor.y = e.mouseMove.y;
     }, sf::Event::MouseMoved);
 
+//    m_events.ConnectCallback([&](sf::Event e){
+//        BOOST_ASSERT(e.type == sf::Event::TouchMoved);
 
-    m_skyIdx = m_textures.size();
-    m_textures.push_back({});
-    BOOST_ASSERT( m_textures.back().loadFromFile("../../Textures/Forest/Clouds.png") );
-    m_textures.back().setRepeated(false);
+//        m_currPosCursor.x = e.touch.x;
+//        m_currPosCursor.y = e.touch.y;
+//    }, sf::Event::TouchMoved);
 
-    // TODO: загрузка других текстур
+
+    // background
+    BOOST_ASSERT( m_skyTexture.loadFromFile(ROOT_PATH "Textures/Forest/Clouds.png") );
+    BOOST_ASSERT( m_forestTexture[0].loadFromFile(ROOT_PATH "Textures/Forest/Forest back.png") );
+    BOOST_ASSERT( m_forestTexture[1].loadFromFile(ROOT_PATH "Textures/Forest/Forest front.png") );
+    m_skyTexture.setRepeated(true);
+    m_forestTexture[0].setRepeated(true);
+    m_forestTexture[1].setRepeated(true);
+
+    // game
+    BOOST_ASSERT( m_playerTexture.loadFromFile(ROOT_PATH "Textures/Archer/Archer.png") );
+    BOOST_ASSERT( m_zombieTexture.loadFromFile(ROOT_PATH "Textures/Zombie/Zombie 1.png") );
+    BOOST_ASSERT( m_buttelTexture.loadFromFile(ROOT_PATH "Textures/Archer/Arrow.png") );
+
+    // map
+    BOOST_ASSERT( m_pathTexture.loadFromFile(ROOT_PATH "Textures/Forest/Path.png") );
+    BOOST_ASSERT( m_grassTexture.loadFromFile(ROOT_PATH "Textures/Forest/Grass.png") );
+    m_pathTexture.setRepeated(true);
+    m_grassTexture.setRepeated(true);
+    BOOST_ASSERT( m_timbersTexture.loadFromFile(ROOT_PATH "Textures/Forest/Timbers.png") );
 
 }
 
@@ -67,8 +90,7 @@ void Game::ShowMenu() noexcept
         auto btn_w = btn->GetText().getGlobalBounds().width;
         auto btn_h = btn->GetText().getGlobalBounds().height;
 
-        auto tCenter = sf::Vector2f(
-                 win_w / 2,
+        auto tCenter = sf::Vector2f( win_w / 2,
                 (win_h / 3) * (i + 1) - win_h / 6);
 
         tCenter.x -= btn_w / 2;
@@ -80,56 +102,69 @@ void Game::ShowMenu() noexcept
     }
 
     for(auto &&sky : m_background){
-        sky.setTexture(m_textures[m_skyIdx]);
-        sky.setTextureRect({0, 0, static_cast<int>(win_w / 3), static_cast<int>(win_h/5)}); // TODO: продумать размеры
+        sky.setTexture(m_skyTexture);
+        sky.setTextureRect({0, 0, static_cast<int>(win_w / 4), static_cast<int>(win_h/6)}); // TODO: продумать размеры
     }
     m_background[0].setPosition({});
     m_background[1].setPosition({100, static_cast<float>(win_h / 2)});
-    m_background[0].setPosition({static_cast<float>(win_w / 2), static_cast<float>(win_h - win_h / 4)});
-
-    std::cout << m_background[0].getTextureRect().width << " " << m_background[0].getTextureRect().height << std::endl;
+    m_background[2].setPosition({static_cast<float>(win_w / 2), static_cast<float>(win_h - win_h / 4)});
 
     m_stageGame = Menu;
 }
 
 void Game::ShowField() noexcept
 {
-    m_currPosCursor = sf::Mouse::getPosition(*m_pWin);
+    const int win_w = static_cast<int>(m_pWin->getSize().x) + 100;
 
-//    m_player.setTexture(m_txrHelper.GetTexture());
-//    m_player.setTextureRect(m_txrHelper.GetRectByWithOffset(1, {}));
-    m_player.setPosition(0, 0); // TODO: определять позицию по карте
-    m_posShots = {};
+    // TODO: сделать кастомную ориентацию текстур
+    m_background[0].setTextureRect({0, 0, win_w, m_background[0].getTextureRect().height});
+    m_background[0].setPosition(20, 100);
 
-    // TODO: создание интерфейса игры
-    // TODO: создание рендера
-    m_events.ConnectCallback([&](sf::Event e){
-        m_currPosCursor.x = e.mouseMove.x;
-        m_currPosCursor.y = e.mouseMove.y;
-//        std::cout << m_currPosCursor.x << " " << m_currPosCursor.y << std::endl;
-        // TODO: вращать лук(или игрока)
-        // TODO: анимация фона
-    }, sf::Event::MouseMoved);
+    m_background[1].setTexture(m_forestTexture[0], true);
+    m_background[1].setTextureRect({0, 0, win_w + 200, m_background[1].getTextureRect().height});
+    m_background[1].setPosition(-150, 600);
 
-    m_events.ConnectCallback([&](sf::Event e){
-        // TODO: расчитать вектор
-        // TODO: может быть сделать анимацию титевы
-    }, sf::Event::MouseButtonPressed);
+    m_background[2].setTexture(m_forestTexture[1], true);
+    m_background[2].setTextureRect({0, 0, win_w + 200, m_background[2].getTextureRect().height});
+    m_background[2].setPosition(-150, 650);
 
-    m_stageGame = Launch;
+    m_path.setTexture(m_pathTexture, true);
+    m_path.setTextureRect({0, 0, win_w, m_path.getTextureRect().height });
+    m_path.setPosition(-10, 980);
+
+    m_timbers.setTexture(m_timbersTexture, true);
+    m_timbers.setPosition(9, 800);
+
+    m_player.setTexture(m_playerTexture, true);
+    m_player.setPosition(85, 630);
+
+//    m_zombie.push_back({});
+//    m_zombie.back().setTexture(m_zombieTexture);
+//    m_zombie.back().setPosition(1986, 770);
+
+    m_grass.setTexture(m_grassTexture, true);
+    m_grass.setTextureRect({0, 0, win_w, m_grass.getTextureRect().height });
+    m_grass.setPosition(-8, 1030);
+
+//    m_events.ConnectCallback([&](sf::Event e){
+//    }, sf::Event::MouseButtonPressed);
+
+//    m_stageGame = Launch;
+
+    m_buttons.back()->GetText().setPosition(1800, 30);
+    m_buttons.back()->UpdateBackground({10, 10});
+    m_stageGame = InGame;
 }
 
 
 template<>
 void Game::Update__<Game::InGame>() noexcept
 {
-    for(auto &&b : m_buttels){
-        // TODO: шаг снарядов
-    }
+    auto dx = UpdateMoveBackground__();
 
-    for(auto &&z : m_zombie) {
-        // TODO: шаг зомби
-    }
+    m_background[0].move(dx/3, 0);
+    m_background[1].move(dx/2, 0);
+    m_background[2].move(dx/1, 0);
 }
 
 template<>
@@ -149,8 +184,6 @@ void Game::Update__<Game::Menu>() noexcept
 {
      auto dx = UpdateMoveBackground__();
 
-//     std::cout << dx << std::endl;
-
      for(auto &&sky : m_background){
          sky.move(dx, 0);
      }
@@ -160,6 +193,37 @@ void Game::Update__<Game::Menu>() noexcept
 template<>
 void Game::Render__<Game::InGame>() noexcept
 {
+    ClearWindow__();
+
+    // небо, лес
+    for(auto &&back : m_background){
+        m_pWin->draw(back);
+    }
+    // тропа
+    m_pWin->draw(m_path);
+
+    // платформа
+    m_pWin->draw(m_timbers);
+
+    // игрок
+    m_pWin->draw(m_player);
+
+    // зомби
+    for(auto && z : m_zombie){
+        m_pWin->draw(z);
+    }
+
+    // стрелы
+    for(auto && b : m_buttels){
+        m_pWin->draw(b);
+    }
+
+    // трава
+    m_pWin->draw(m_grass);
+
+    m_pWin->draw(*m_buttons.back());
+
+    m_pWin->display();
 }
 
 template<>
@@ -215,13 +279,7 @@ void Game::Display() noexcept
                 Render__<Menu>();
                 break;
             default: ;
-            }/*
-            std::cout << "current: ";
-            std::cout << m_currPosCursor.x << " " << m_currPosCursor.y << std::endl;
-
-            std::cout << "old: ";
-            std::cout << m_oldPosCursor.x << " " << m_oldPosCursor.y << std::endl;*/
-
+            }
         }
         m_events.StopListening();
     }).detach();
@@ -237,7 +295,7 @@ uint Game::GetCharacterSize__() const noexcept
 float Game::UpdateMoveBackground__() noexcept
 {
     float dx = m_oldPosCursor.x - m_currPosCursor.x;
-    dx /= -30;
+    dx /= -45;
 
     m_oldPosCursor = m_currPosCursor;
 
