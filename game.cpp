@@ -2,8 +2,8 @@
 
 #include "allinclusions.hpp"
 
-Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0], // TODO: посмотреть другие
-                                                        "Attack Reflection"/*, sf::Style::Fullscreen*/)),
+Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
+                                                        "Attack Reflection", sf::Style::Fullscreen)),
     m_events(m_pWin)
 {
     m_pWin->setFramerateLimit(60);
@@ -27,12 +27,12 @@ void Game::Init() noexcept
     m_buttons[2]->GetBackground().setFillColor(sf::Color::Red);
 
     // start
-    m_events.RegisterButton(m_buttons[0], EventController::EventButtom_t::Pressed, [&](EventController::EventButtom_t ev){
+    m_events.RegisterButton(m_buttons[0], EventController::EventButtom_t::Pressed, [&]([[maybe_unused]]  EventController::EventButtom_t ev){
         m_stageGame = Launch;
     });
 
     // end
-    m_events.RegisterButton(m_buttons[2], EventController::EventButtom_t::Pressed, [&](EventController::EventButtom_t ev){
+    m_events.RegisterButton(m_buttons[2], EventController::EventButtom_t::Pressed, [&]([[maybe_unused]] EventController::EventButtom_t ev){
         m_pWin->close();
     });
 
@@ -44,13 +44,13 @@ void Game::Init() noexcept
     }, sf::Event::MouseMoved);
 
 
-    // загрузка текстур
-    m_skyIdx = m_txrHelper.Load("", 2);
-//    m_forestIdx1 = m_txrHelper.Load("", 5); // TODO: размеры!
-//    m_forestIdx2 = m_txrHelper.Load("", 5);
+    m_skyIdx = m_textures.size();
+    m_textures.push_back({});
+    BOOST_ASSERT( m_textures.back().loadFromFile("../../Textures/Forest/Clouds.png") );
+    m_textures.back().setRepeated(false);
 
-    m_txrHelper.MergeTexture();
-    m_events.StartListeningSync();
+    // TODO: загрузка других текстур
+
 }
 
 void Game::ShowMenu() noexcept
@@ -79,12 +79,16 @@ void Game::ShowMenu() noexcept
         btn->UpdateBackground();
     }
 
-    for(size_t i = 0; i < m_background.size(); ++i){
-        m_background[i].setTexture(m_txrHelper.GetTexture());
-        m_background[i].setTextureRect(m_txrHelper.GetRectBy(m_skyIdx));
-
-        m_background[i].setPosition((win_w / 3) * i, (win_h / 3) * i );
+    for(auto &&sky : m_background){
+        sky.setTexture(m_textures[m_skyIdx]);
+        sky.setTextureRect({0, 0, static_cast<int>(win_w / 3), static_cast<int>(win_h/5)}); // TODO: продумать размеры
     }
+    m_background[0].setPosition({});
+    m_background[1].setPosition({100, static_cast<float>(win_h / 2)});
+    m_background[0].setPosition({static_cast<float>(win_w / 2), static_cast<float>(win_h - win_h / 4)});
+
+    std::cout << m_background[0].getTextureRect().width << " " << m_background[0].getTextureRect().height << std::endl;
+
     m_stageGame = Menu;
 }
 
@@ -92,16 +96,17 @@ void Game::ShowField() noexcept
 {
     m_currPosCursor = sf::Mouse::getPosition(*m_pWin);
 
-    m_player.setTexture(m_txrHelper.GetTexture());
-    m_player.setTextureRect(m_txrHelper.GetRectByWithOffset(1, {}));
+//    m_player.setTexture(m_txrHelper.GetTexture());
+//    m_player.setTextureRect(m_txrHelper.GetRectByWithOffset(1, {}));
     m_player.setPosition(0, 0); // TODO: определять позицию по карте
     m_posShots = {};
 
     // TODO: создание интерфейса игры
     // TODO: создание рендера
     m_events.ConnectCallback([&](sf::Event e){
-        m_currPosCursor.x += e.mouseMove.x;
-        m_currPosCursor.y += e.mouseMove.y;
+        m_currPosCursor.x = e.mouseMove.x;
+        m_currPosCursor.y = e.mouseMove.y;
+//        std::cout << m_currPosCursor.x << " " << m_currPosCursor.y << std::endl;
         // TODO: вращать лук(или игрока)
         // TODO: анимация фона
     }, sf::Event::MouseMoved);
@@ -144,6 +149,8 @@ void Game::Update__<Game::Menu>() noexcept
 {
      auto dx = UpdateMoveBackground__();
 
+//     std::cout << dx << std::endl;
+
      for(auto &&sky : m_background){
          sky.move(dx, 0);
      }
@@ -168,6 +175,8 @@ void Game::Render__<Game::Launch>() noexcept
 template<>
 void Game::Render__<Game::Menu>() noexcept
 {
+    ClearWindow__();
+
     for(auto &&sky : m_background){
         m_pWin->draw(sky);
     }
@@ -180,7 +189,7 @@ void Game::Render__<Game::Menu>() noexcept
 
 void Game::Display() noexcept
 {
-    if(m_stageGame != Nope){
+    if(m_stageGame == Nope){
         return;
     }
 
@@ -206,11 +215,18 @@ void Game::Display() noexcept
                 Render__<Menu>();
                 break;
             default: ;
-            }
-            m_oldPosCursor = m_currPosCursor;
+            }/*
+            std::cout << "current: ";
+            std::cout << m_currPosCursor.x << " " << m_currPosCursor.y << std::endl;
+
+            std::cout << "old: ";
+            std::cout << m_oldPosCursor.x << " " << m_oldPosCursor.y << std::endl;*/
+
         }
         m_events.StopListening();
     }).detach();
+
+    m_events.StartListeningSync();
 }
 
 uint Game::GetCharacterSize__() const noexcept
@@ -223,5 +239,12 @@ float Game::UpdateMoveBackground__() noexcept
     float dx = m_oldPosCursor.x - m_currPosCursor.x;
     dx /= -30;
 
+    m_oldPosCursor = m_currPosCursor;
+
     return dx;
+}
+
+void Game::ClearWindow__() noexcept
+{
+    m_pWin->clear(sf::Color::Cyan);
 }

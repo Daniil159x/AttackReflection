@@ -2,9 +2,9 @@
 
 
 #include "allinclusions.hpp"
-
+/*
 // TODO: улучшить обнаружение
-bool Collision::PixelPerfectTest(const sf::Sprite &obj_1, const sf::Sprite &obj_2, const TextureHelper &helper, sf::Uint8 AlphaLimit)
+bool Collision::PixelPerfectTest(const sf::Sprite &obj_1, const sf::Sprite &obj_2, sf::Uint8 AlphaLimit)
 {
     BOOST_ASSERT_MSG(obj_1.getTexture() == &helper.GetTexture() &&
                      obj_2.getTexture() == &helper.GetTexture(), "Texture must be coincide");
@@ -45,4 +45,4 @@ bool Collision::PixelPerfectTest(const sf::Sprite &obj_1, const sf::Sprite &obj_
 
     }
     return false;
-}
+}*/

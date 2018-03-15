@@ -31,7 +31,7 @@ private:
     // service
     WinPtr_t        m_pWin;
     EventController m_events;
-    TextureHelper   m_txrHelper;
+//    TextureHelper   m_txrHelper;
     enum stage_t {
         /// ничего
         Nope,
@@ -44,6 +44,7 @@ private:
         /// выход из поля игры
         Finish
     } m_stageGame = stage_t::Nope;
+    std::vector<sf::Texture> m_textures;
 
     // background
     std::array<sf::Sprite, 3> m_background;
@@ -74,6 +75,8 @@ private:
     uint GetCharacterSize__() const noexcept;
 
     float UpdateMoveBackground__() noexcept;
+
+    void ClearWindow__() noexcept;
 };
 
 #endif // GAME_HPP

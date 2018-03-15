@@ -19,7 +19,6 @@ SOURCES += \
         main.cpp \
     eventcontroller.cpp \
     game.cpp \
-    texturehelper.cpp \
     utilities.cpp \
     mob.cpp \
     disappearing.cpp \
@@ -34,7 +33,6 @@ HEADERS += \
     eventcontroller.hpp \
     utilities.hpp \
     game.hpp \
-    texturehelper.hpp \
     mob.hpp \
     disappearing.hpp \
     bullet.hpp \

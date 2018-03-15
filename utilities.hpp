@@ -32,7 +32,7 @@ inline float CalculateRotate(const sf::Vector2f &from, const sf::Vector2f &to)
 
 class TextureHelper;
 namespace Collision {
-    bool PixelPerfectTest(const sf::Sprite& obj_1, const sf::Sprite& obj_2, TextureHelper const& helper, sf::Uint8 AlphaLimit = 127);
+    bool PixelPerfectTest(const sf::Sprite& obj_1, const sf::Sprite& obj_2, sf::Uint8 AlphaLimit = 127);
 }
 
 #endif // UTILITIES_HPP
