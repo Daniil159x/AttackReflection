@@ -60,10 +60,11 @@ private:
 
     // TODO: что то сделать с текстурами
     // game loop
-    Mob m_player;
+//    Mob m_player;
     //      active
     sf::Texture m_playerTexture;
-    sf::Texture m_zombieTexture;
+    Animation::SharedFrames m_zombieFrames;
+//    std::vector<sf::Texture> m_zombieTexture;
     sf::Texture m_buttelTexture;
     //      map
     sf::Texture m_pathTexture;
@@ -73,7 +74,7 @@ private:
     sf::Sprite  m_grass;
     sf::Sprite  m_timbers;
     // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
-    std::deque<Mob> m_zombie;
+    std::deque<Zombie> m_zombie;
     std::deque<Bullet> m_buttels;
 
     template<stage_t st>

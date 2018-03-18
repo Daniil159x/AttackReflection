@@ -2,12 +2,52 @@
 
 #include "allinclusions.hpp"
 
-
-Mob::Mob()
+Animation::Animation(uint8_t callsOnFrame, uint8_t lvlDis) : Disappearing(lvlDis), m_callsOnFrame(callsOnFrame)
 {}
 
-Mob::Mob(const sf::Texture &texture, const sf::IntRect &rectangle, int8_t hp, uint8_t lvls)
-    : Disappearing (texture, rectangle, lvls), m_hp(hp)
+void Animation::NextFrame() noexcept
+{
+    ++m_countCalls;
+    if(m_callsOnFrame == m_countCalls){
+        m_currFrame = (m_currFrame + 1) % m_shFrames->size();
+        ApplyFrame_(m_currFrame);
+        m_countCalls = 0;
+    }
+}
+
+Animation::~Animation() noexcept
+{}
+
+void Animation::AppendFrameToShared(Animation::SharedFrames &tFrames, const SharedTexture &txr, const sf::IntRect &bounds) noexcept
+{
+    BOOST_ASSERT(tFrames);
+    tFrames->emplace_back(txr, bounds);
+}
+
+void Animation::SetSharedFrames(const Animation::SharedFrames &shf) noexcept
+{
+    BOOST_ASSERT(shf);
+    m_shFrames = shf;
+}
+
+Animation::SharedFrames const &Animation::GetSharedFrames() const noexcept
+{
+    return m_shFrames;
+}
+
+void Animation::SetCallsOnFrame(const uint8_t &callsOnFrame) noexcept
+{
+    m_callsOnFrame = callsOnFrame;
+}
+
+void Animation::SetCurrFrame(size_t idx) noexcept
+{
+    m_currFrame = idx;
+    ApplyFrame_(idx);
+}
+
+Mob::Mob(int8_t hp, uint8_t callsOnFrame, uint8_t lvls)
+    : Animation(callsOnFrame, lvls), m_hp(hp)
 {}
 
 void Mob::SetHP(int8_t hp) noexcept
@@ -34,3 +74,6 @@ bool Mob::Alive() const noexcept
 {
     return m_hp > 0;
 }
+
+Mob::~Mob() noexcept
+{}

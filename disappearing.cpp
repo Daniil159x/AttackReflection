@@ -2,11 +2,8 @@
 
 #include "allinclusions.hpp"
 
-Disappearing::Disappearing()
-{}
-
-Disappearing::Disappearing(const sf::Texture &texture, const sf::IntRect &rectangle, uint8_t lvls)
-    : sf::Sprite(texture, rectangle), m_lvls(lvls), m_original(getColor().a)
+Disappearing::Disappearing(uint8_t lvls)
+    : m_lvls(lvls), m_currAlpha(m_original)
 {}
 
 uint8_t Disappearing::GetLvls() const noexcept
@@ -22,28 +19,26 @@ void Disappearing::SetLvls(uint8_t lvls) noexcept
 
 bool Disappearing::NextLevel() noexcept
 {
-    auto c = getColor();
     const uint8_t step = 255 / m_lvls;
-    bool hasOverflow = (c.a <= step);
+    bool hasOverflow = (m_currAlpha <= step);
 
-    setColor({c.r, c.g, c.b, hasOverflow ? uint8_t(0) : uint8_t(c.a - step)});
+    m_currAlpha -= step;
+
+    ApplyAlpha_(m_currAlpha);
     return hasOverflow;
 }
 
 void Disappearing::MinLevel() noexcept
 {
-    auto &&c = getColor();
-    setColor({c.r, c.g, c.b, 255});
+    ApplyAlpha_(255);
 }
 
 void Disappearing::MaxLevel() noexcept
 {
-    auto &&c = getColor();
-    setColor({c.r, c.g, c.b, 0});
+    ApplyAlpha_(0);
 }
 
 void Disappearing::OriginalLevel() noexcept
 {
-    auto &&c = getColor();
-    setColor({c.r, c.g, c.b, m_original});
+    ApplyAlpha_(m_original);
 }

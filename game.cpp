@@ -5,8 +5,8 @@
 #define ROOT_PATH "../../"
 
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
-                                                        "Attack Reflection", sf::Style::Fullscreen)),
-    m_events(m_pWin)
+                                                        "Attack Reflection"/*, sf::Style::Fullscreen*/)),
+    m_events(m_pWin), m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>())
 {
 //    m_pWin->setFramerateLimit(60);
     m_pWin->setVerticalSyncEnabled(true);
@@ -64,7 +64,16 @@ void Game::Init() noexcept
 
     // game
     BOOST_ASSERT( m_playerTexture.loadFromFile(ROOT_PATH "Textures/Archer/Archer.png") );
-    BOOST_ASSERT( m_zombieTexture.loadFromFile(ROOT_PATH "Textures/Zombie/Zombie 1.png") );
+
+    SharedTexture tmp;
+    for(uint i = 1; i <= 6; ++i) {
+        tmp = std::make_shared<sf::Texture>();
+        tmp->loadFromFile(ROOT_PATH "Textures/Zombie/Zombie " + std::to_string(i) + ".png");
+        const auto [w, h] = sf::Vector2i(tmp->getSize());
+        Animation::AppendFrameToShared(m_zombieFrames, tmp, {0, 0, w, h});
+    }
+
+//    BOOST_ASSERT( m_zombieTexture.loadFromFile(ROOT_PATH "Textures/Zombie/Zombie 1.png") );
     BOOST_ASSERT( m_buttelTexture.loadFromFile(ROOT_PATH "Textures/Archer/Arrow.png") );
 
     // map
@@ -135,12 +144,14 @@ void Game::ShowField() noexcept
     m_timbers.setTexture(m_timbersTexture, true);
     m_timbers.setPosition(9, 800);
 
-    m_player.setTexture(m_playerTexture, true);
-    m_player.setPosition(85, 630);
+//    m_player.setTexture(m_playerTexture, true);
+//    m_player.setPosition(85, 630);
 
-//    m_zombie.push_back({});
-//    m_zombie.back().setTexture(m_zombieTexture);
-//    m_zombie.back().setPosition(1986, 770);
+    m_zombie.push_back({});
+    m_zombie.back().SetSharedFrames(m_zombieFrames);
+    m_zombie.back().SetSharedFrames(m_zombieFrames);
+    m_zombie.back().SetFrameEats(m_zombieFrames->size() - 1);
+    m_zombie.back().setPosition(1986, 770);
 
     m_grass.setTexture(m_grassTexture, true);
     m_grass.setTextureRect({0, 0, win_w, m_grass.getTextureRect().height });
@@ -153,6 +164,17 @@ void Game::ShowField() noexcept
 
     m_buttons.back()->GetText().setPosition(1800, 30);
     m_buttons.back()->UpdateBackground({10, 10});
+
+
+    m_events.ConnectCallback([&](sf::Event e){
+        m_zombie.back().Eats();
+    }, sf::Event::KeyPressed, sf::Keyboard::Q);
+
+    m_events.ConnectCallback([&](sf::Event e){
+        m_zombie.back().StopEats();
+    }, sf::Event::KeyReleased, sf::Keyboard::W);
+
+
     m_stageGame = InGame;
 }
 
@@ -162,8 +184,12 @@ void Game::Update__<Game::InGame>() noexcept
 {
     auto dx = UpdateMoveBackground__();
 
-    m_background[0].move(dx/3, 0);
-    m_background[1].move(dx/2, 0);
+    for(auto &&z : m_zombie){
+        z.Turn(-1.f, 0);
+    }
+
+    m_background[0].move(dx/6, 0);
+    m_background[1].move(dx/3, 0);
     m_background[2].move(dx/1, 0);
 }
 
@@ -206,7 +232,7 @@ void Game::Render__<Game::InGame>() noexcept
     m_pWin->draw(m_timbers);
 
     // игрок
-    m_pWin->draw(m_player);
+//    m_pWin->draw(m_player);
 
     // зомби
     for(auto && z : m_zombie){
@@ -295,7 +321,7 @@ uint Game::GetCharacterSize__() const noexcept
 float Game::UpdateMoveBackground__() noexcept
 {
     float dx = m_oldPosCursor.x - m_currPosCursor.x;
-    dx /= -45;
+    dx /= -30;
 
     m_oldPosCursor = m_currPosCursor;
 
