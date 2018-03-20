@@ -4,10 +4,7 @@
 
 
 Zombie::Zombie() : Mob (100, 20, 100)
-{
-//    m_sprite.setTexture(m_frames[m_currFrame].txr);
-//    m_sprite.setTextureRect(m_frames[m_currFrame].txrRect);
-}
+{}
 
 void Zombie::Eats() noexcept
 {
@@ -46,7 +43,7 @@ Zombie::~Zombie() noexcept
 
 void Zombie::ApplyFrame_(size_t idx) noexcept
 {
-    if(m_currFrame == m_frameEat){
+    if(m_currFrame == m_frameEat || m_currFrame == m_frameDead){
         return;
     }
     m_sprite.setTexture(*m_shFrames->at(idx).txr);
@@ -64,4 +61,9 @@ void Zombie::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     target.draw(m_sprite, states);
+}
+
+void Zombie::Deaded() noexcept
+{
+    m_currFrame = m_frameDead;
 }

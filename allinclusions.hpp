@@ -22,13 +22,13 @@
 #include "disappearing.hpp"
 #include "mob.hpp"
 
+#include "player.hpp"
 #include "zombie.hpp"
 
 #include "bullet.hpp"
 #include "button.hpp"
 
 #include "eventcontroller.hpp"
-
 
 #include "game.hpp"
 

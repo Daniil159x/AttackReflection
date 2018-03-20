@@ -25,8 +25,6 @@ public:
 
     void SetSharedFrames(SharedFrames const &shf) noexcept;
     const SharedFrames &GetSharedFrames() const noexcept;
-//    void AppendTexture(const sf::Texture &txr, std::vector<sf::IntRect> const& bounds) noexcept;
-//    void AppendTexture(const sf::Texture &txr, const sf::IntRect &bounds) noexcept;
     void SetCallsOnFrame(const uint8_t &callsOnFrame) noexcept;
     void SetCurrFrame(size_t idx) noexcept;
 
@@ -38,6 +36,9 @@ protected:
     uint8_t              m_countCalls = 0;
 
     virtual void ApplyFrame_(size_t idx) noexcept = 0;
+    virtual void Init() noexcept;
+
+    bool CheckCalls() noexcept;
 };
 
 
@@ -49,11 +50,13 @@ public:
     inline void SetHP(int8_t hp) noexcept;
     inline int8_t GetHP() const noexcept;
     inline bool Damage(int8_t d) noexcept;
-    inline bool Alive() const noexcept;
+    bool Alive() const noexcept;
 
     virtual ~Mob() noexcept override;
 protected:
     int8_t m_hp;
+
+    virtual void Deaded() noexcept;
 };
 
 #endif // MOB_HPP

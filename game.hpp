@@ -12,6 +12,10 @@
 class Game : boost::noncopyable
 {
 public:
+    using clock_t      = std::chrono::system_clock;
+    using time_point_t = clock_t::time_point;
+    using duration_t   = time_point_t::duration;
+
     Game();
 
     /// инициализация игры, создаение окна, рендера и контролера, начальные бинды
@@ -46,8 +50,8 @@ private:
     } m_stageGame = stage_t::Nope;
 
     // background
-    std::array<sf::Sprite, 3> m_background;
-    sf::Texture m_skyTexture;
+    std::array<sf::Sprite, 3>  m_background;
+    sf::Texture                m_skyTexture;
     std::array<sf::Texture, 2> m_forestTexture;
 
     // mouse
@@ -60,11 +64,14 @@ private:
 
     // TODO: что то сделать с текстурами
     // game loop
-//    Mob m_player;
+    Player m_player;
+    bool   m_pressedLBtn     = false;
+    bool   m_lastPressedLBtn = false;
+//    bool   m_hasShot     = false;
     //      active
-    sf::Texture m_playerTexture;
+    Animation::SharedFrames m_archerBowFrames;
+    sf::Texture             m_archerBody;
     Animation::SharedFrames m_zombieFrames;
-//    std::vector<sf::Texture> m_zombieTexture;
     sf::Texture m_buttelTexture;
     //      map
     sf::Texture m_pathTexture;
@@ -73,6 +80,8 @@ private:
     sf::Sprite  m_path;
     sf::Sprite  m_grass;
     sf::Sprite  m_timbers;
+
+    time_point_t m_timeLastZombie;
     // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
     std::deque<Zombie> m_zombie;
     std::deque<Bullet> m_buttels;

@@ -24,7 +24,8 @@ SOURCES += \
     disappearing.cpp \
     bullet.cpp \
     button.cpp \
-    zombie.cpp
+    zombie.cpp \
+    player.cpp
 
 HEADERS += \
     extinclusions.hpp \
@@ -38,7 +39,8 @@ HEADERS += \
     disappearing.hpp \
     bullet.hpp \
     button.hpp \
-    zombie.hpp
+    zombie.hpp \
+    player.hpp
 
 PRECOMPILED_HEADER += extinclusions.hpp
 

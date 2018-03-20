@@ -16,22 +16,22 @@ public:
 //    virtual void NextFrame() noexcept override;
     void Turn(float x, float y) noexcept;
 
-//    virtual void NextFrame() noexcept override;
 
     virtual ~Zombie() noexcept override;
 protected:
     virtual void ApplyFrame_(size_t idx) noexcept override;
     virtual void ApplyAlpha_(uint8_t a) noexcept override;
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    virtual void Deaded() noexcept override;
+
 private:
     sf::Sprite m_sprite;
     // TODO: сделать live полосу(или прогресс бар)
 
-    size_t m_frameEat;
-    size_t m_frameDead;
+    size_t m_frameEat = 100000;
+    size_t m_frameDead = 100000;
 
-//    bool
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
 #endif // ZOMBIE_HPP
