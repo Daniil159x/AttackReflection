@@ -60,16 +60,21 @@ bool Animation::CheckCalls() noexcept
 
 
 
-Mob::Mob(int8_t hp, uint8_t callsOnFrame, uint8_t lvls)
+Mob::Mob(float hp, uint8_t callsOnFrame, uint8_t lvls)
     : Animation(callsOnFrame, lvls), m_hp(hp)
-{}
+{
+    m_streakHP.setSize({hp, 5});
+    m_streakHP.setOutlineColor(sf::Color::Black);
+    m_streakHP.setOutlineThickness(2);
+    m_streakHP.setFillColor(sf::Color::Green);
+}
 
-void Mob::SetHP(int8_t hp) noexcept
+void Mob::SetHP(float hp) noexcept
 {
     m_hp = hp;
 }
 
-int8_t Mob::GetHP() const noexcept
+float Mob::GetHP() const noexcept
 {
     return m_hp;
 }
@@ -79,11 +84,12 @@ bool Mob::Damage(float d) noexcept
     if(Alive() && (m_hp >= INT8_MIN + d))
     {
         m_hp -= d;
+        SetHPInSteakHP_(m_hp);
         if(m_hp > 0){
             return true;
         }
         else {
-            Deaded();
+            Deaded_();
             return false;
         }
     }
@@ -98,5 +104,17 @@ bool Mob::Alive() const noexcept
 Mob::~Mob() noexcept
 {}
 
-void Mob::Deaded() noexcept
+void Mob::Deaded_() noexcept
 {}
+
+void Mob::SetHPInSteakHP_(float hp) noexcept
+{
+    if(hp <= 0){
+        m_streakHP.setOutlineThickness(0);
+        m_streakHP.setSize({});
+    }
+    else {
+        m_streakHP.setSize({hp, 5});
+    }
+}
+

@@ -8,6 +8,7 @@ void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
     target.draw(m_body, states);
     target.draw(m_bow);
     target.draw(m_head);
+    target.draw(m_streakHP);
 }
 
 void Player::ApplyAlpha_(uint8_t alpha) noexcept
@@ -43,6 +44,7 @@ void Player::SetTextureBody(const sf::Texture &tx, const sf::IntRect &rect) noex
 
     m_head.setTexture(tx);
     m_head.setTextureRect({120, 0, 35, 39});
+
 }
 
 void Player::SetRotateBow(float r) noexcept
@@ -52,6 +54,8 @@ void Player::SetRotateBow(float r) noexcept
         m_bow.setRotation(r - 18.2084f);
 
         m_head.setPosition(this->getPosition() + sf::Vector2f{120, 0});
+
+        m_streakHP.setPosition(this->getPosition() + sf::Vector2f{60, -20});
     }
 }
 

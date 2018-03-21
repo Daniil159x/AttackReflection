@@ -16,6 +16,8 @@ public:
 //    virtual void NextFrame() noexcept override;
     void Turn(float x, float y) noexcept;
 
+    bool IsCollision(sf::Vector2f p) const noexcept;
+
     sf::FloatRect GetGlobalBounds() const noexcept;
 
     virtual ~Zombie() noexcept override;
@@ -23,7 +25,7 @@ protected:
     virtual void ApplyFrame_(size_t idx) noexcept override;
     virtual void ApplyAlpha_(uint8_t a) noexcept override;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    virtual void Deaded() noexcept override;
+    virtual void Deaded_() noexcept override;
 
 private:
     sf::Sprite m_sprite;

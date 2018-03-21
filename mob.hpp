@@ -45,19 +45,20 @@ protected:
 class Mob : public Animation
 {
 public:
-    Mob(int8_t hp = 100, uint8_t callsOnFrame = 1, uint8_t lvls = 10);
+    Mob(float hp = 100, uint8_t callsOnFrame = 1, uint8_t lvls = 10);
 
-    void SetHP(int8_t hp) noexcept;
-    int8_t GetHP() const noexcept;
+    void SetHP(float hp) noexcept;
+    float GetHP() const noexcept;
     bool Damage(float d) noexcept;
     bool Alive() const noexcept;
 
     virtual ~Mob() noexcept override;
 protected:
-    int8_t m_hp;
-//    sf::RectangleShape m_
+    float m_hp;
+    sf::RectangleShape m_streakHP;
 
-    virtual void Deaded() noexcept;
+    virtual void Deaded_() noexcept;
+    void SetHPInSteakHP_(float hp) noexcept;
 };
 
 #endif // MOB_HPP

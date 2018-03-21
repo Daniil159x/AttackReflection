@@ -85,6 +85,12 @@ private:
     std::deque<Zombie> m_zombie;
     std::deque<Bullet> m_bullets;
 
+    // end
+    sf::Font m_font;
+    sf::Text m_endText;
+    time_point_t     m_begin;
+    const duration_t m_delay;
+
     template<stage_t st>
     void Update__() noexcept;
 

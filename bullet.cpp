@@ -3,7 +3,7 @@
 #include "allinclusions.hpp"
 
 
-Bullet::Bullet(const sf::Texture &texture, const sf::IntRect &rectangle, uint8_t dmg, uint8_t lvls)
+Bullet::Bullet(const sf::Texture &texture, const sf::IntRect &rectangle, float dmg, uint8_t lvls)
     : Disappearing(lvls), sf::Sprite(texture, rectangle), m_damage(dmg)
 {}
 
@@ -32,12 +32,12 @@ void Bullet::Tick(float dx) noexcept
     ++m_tick;*/
 }
 
-uint8_t Bullet::GetDamage() const noexcept
+float Bullet::GetDamage() const noexcept
 {
     return m_damage;
 }
 
-void Bullet::SetDamage(uint8_t damage) noexcept
+void Bullet::SetDamage(float damage) noexcept
 {
     m_damage = damage;
 }
@@ -49,12 +49,12 @@ void Bullet::ApplyAlpha_(uint8_t alpha) noexcept
     this->setColor(c);
 }
 
-bool Bullet::GetIsActive() const noexcept
+bool Bullet::GetActive() const noexcept
 {
     return m_isActive;
 }
 
-void Bullet::SetIsActive(bool isActive) noexcept
+void Bullet::SetActive(bool isActive) noexcept
 {
     m_isActive = isActive;
 }

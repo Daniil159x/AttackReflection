@@ -4,14 +4,27 @@
 
 #define ROOT_PATH "../../"
 
+using namespace std::chrono_literals;
+
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
                                                         "Attack Reflection"/*, sf::Style::Fullscreen*/)),
     m_events(m_pWin), m_archerBowFrames(std::make_shared<std::vector<Animation::Frame_t>>()),
-    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>())
+    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delay(std::chrono::duration_cast<duration_t>(2s))
 {
     m_pWin->setFramerateLimit(60);
 //    m_pWin->setVerticalSyncEnabled(true);
     m_pWin->setKeyRepeatEnabled(false);
+
+
+    m_font.loadFromFile(ROOT_PATH "Fonts/486.ttf");
+    m_endText.setFont(m_font);
+    m_endText.setString("GAME OVER");
+    m_endText.setCharacterSize(50);
+
+    auto [x, y, w, h]   = m_endText.getLocalBounds();
+    auto [x_win, y_win] = m_pWin->getSize();
+
+    m_endText.setPosition( x_win/2 - w/2, y_win/2 - h/2);
 }
 
 void Game::Init() noexcept
@@ -169,6 +182,7 @@ void Game::ShowField() noexcept
     m_zombie.back().SetSharedFrames(m_zombieFrames);
     m_zombie.back().SetFrameEats(m_zombieFrames->size() - 1);
     m_zombie.back().setPosition(1986, 840);
+    m_zombie.back().SetCallsOnFrame(15);
 
     m_grass.setTexture(m_grassTexture, true);
     m_grass.setTextureRect({0, 0, win_w, m_grass.getTextureRect().height });
@@ -212,8 +226,9 @@ void Game::Update__<Game::InGame>() noexcept
         auto &&b = m_bullets.emplace_back(m_bulletTexture, sf::IntRect{0, 0, static_cast<int>(x), static_cast<int>(y)}, 50);
         b.setPosition(m_player.GetCenterBow());
         b.setRotation(m_player.GetRotateBow());
-        b.SetLvls(100);
-        b.SetIsActive(true);
+        b.SetLvls(50);
+        b.SetActive(true);
+        b.SetDamage(forse);
         m_player.Shot();
     }
 
@@ -226,13 +241,10 @@ void Game::Update__<Game::InGame>() noexcept
         const auto tip    = it->getTransform().transformPoint(w, h/2);
         const auto line_y   = m_path.getPosition().y + m_pathTexture.getSize().y / 2;
 
-        std::cout << line_y << " " << tip.y << std::endl;
         if( tip.y >= line_y ){
-            it->SetIsActive(false);
+            it->SetActive(false);
         }
-
-        std::cout << "active: " << it->GetIsActive() << std::endl;
-        if(!it->GetIsActive()){
+        if(!it->GetActive()){
             if(it->NextLevel()){
                 it = m_bullets.erase(it);
             }
@@ -244,6 +256,17 @@ void Game::Update__<Game::InGame>() noexcept
 
         it->Tick(10);
 
+        // коллизии
+        for(auto &&z : m_zombie){
+            bool has = z.IsCollision(tip);
+            if(has){
+                it->SetActive(false);
+                z.Damage(it->GetDamage());
+                break;
+            }
+            std::cout << has << std::endl;
+        }
+
         if(!WinRect.contains(it->getPosition())){
             it = m_bullets.erase(it);
         }
@@ -252,35 +275,15 @@ void Game::Update__<Game::InGame>() noexcept
         }
     }
 
-//    static auto draw_point = [&](sf::Vector2f p, sf::Color c){
-//        sf::Vertex line1[2];
-//        line1[0].position = sf::Vector2f(p.x, 0);
-//        line1[0].color  = c;
-//        line1[1].position = sf::Vector2f(p.x, m_pWin->getSize().y);
-//        line1[1].color = c;
-
-//        sf::Vertex line2[2];
-//        line2[0].position = sf::Vector2f(0, p.y);
-//        line2[0].color  = c;
-//        line2[1].position = sf::Vector2f(m_pWin->getSize().x, p.y);
-//        line2[1].color = c;
-
-//        m_pWin->draw(line1, 2, sf::Lines);
-//        m_pWin->draw(line2, 2, sf::Lines);
-//    };
 
     // зомби
     for(auto &&it = m_zombie.begin(); it != m_zombie.end();){
         if(it->Alive()){
-            // TODO: коллизия стрелы
 
             const auto [x, y, w, h] = it->GetGlobalBounds();
-            const auto x_target = x + w/2;//, y_target = y + h;
-//            std::cout << x_target << " " << y_target << std::endl;
-//            draw_point({x_target, y_target}, sf::Color::Yellow);
+            const auto x_target = x + w/2;
 
             const auto x_player = m_player.getPosition().x + 170;
-//            draw_point({x_player, 0}, sf::Color::Red);
             if(x_player >= x_target){
                 it->Eats(m_player);
                 ++it;
@@ -288,15 +291,10 @@ void Game::Update__<Game::InGame>() noexcept
             }
             const auto x_stairs_end = m_timbers.getPosition().x + 525;
             const auto x_stairs_begin = m_timbers.getPosition().x + 280;
-//            draw_point({x_stairs_end, 0}, sf::Color::Blue);
-//            draw_point({x_stairs_begin, 0}, sf::Color::Green);
             const float dx = -1;
             if(x_stairs_begin <= x_target && x_target <= x_stairs_end){
                 it->Turn(dx, dx * 145.f / 206.f);
             }
-//            else if(x_stairs_begin >= x_target){
-//                it->Turn(1, 0);
-//            }
             else {
                 it->Turn(dx, 0);
             }
@@ -315,6 +313,7 @@ void Game::Update__<Game::InGame>() noexcept
 
 
     if(!m_player.Alive()){
+        m_begin     = clock_t::now();
         m_stageGame = Finish;
     }
 }
@@ -322,8 +321,10 @@ void Game::Update__<Game::InGame>() noexcept
 template<>
 void Game::Update__<Game::Finish>() noexcept
 {
-    // TODO: анимация конца
-    ShowMenu();
+    auto now = clock_t::now();
+    if((now - m_begin) >= m_delay){
+        ShowMenu();
+    }
 }
 
 template<>
@@ -347,8 +348,6 @@ void Game::Update__<Game::Menu>() noexcept
 template<>
 void Game::Render__<Game::InGame>() noexcept
 {
-    ClearWindow__();
-
     // небо, лес
     for(auto &&back : m_background){
         m_pWin->draw(back);
@@ -379,13 +378,14 @@ void Game::Render__<Game::InGame>() noexcept
     m_pWin->draw(m_grass);
 
     m_pWin->draw(*m_buttons.back());
-
-    m_pWin->display();
 }
 
 template<>
 void Game::Render__<Game::Finish>() noexcept
 {
+    Render__<InGame>();
+    m_pWin->draw(m_endText);
+//    std::cout << m_endText.getPosition().x << " " << m_endText.getPosition().y << std::endl;
 }
 
 template<>
@@ -417,6 +417,8 @@ void Game::Display() noexcept
     std::thread([&](){
         while(m_pWin->isOpen() && m_stageGame != Nope){
 
+            ClearWindow__();
+
             switch (m_stageGame) {
             case Finish:
                 Update__<Finish>();
@@ -436,6 +438,8 @@ void Game::Display() noexcept
                 break;
             default: ;
             }
+
+            m_pWin->display();
         }
         m_events.StopListening();
     }).detach();
