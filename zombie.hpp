@@ -29,7 +29,6 @@ protected:
 
 private:
     sf::Sprite m_sprite;
-    // TODO: сделать live полосу(или прогресс бар)
 
     size_t m_frameEat = 100000;
     size_t m_frameDead = 100000;

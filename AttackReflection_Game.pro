@@ -2,7 +2,6 @@ TARGET = AttackReflection_Game
 TEMPLATE = app
 
 
-CONFIG += console
 CONFIG += thread
 CONFIG += precompile_header
 
@@ -11,8 +10,15 @@ CONFIG -= qt
 
 
 QMAKE_CXXFLAGS += -std=c++17
-!debug:QMAKE_CXXFLAGS += -O3
-debug:QMAKE_CXXFLAGS  += -O0
+
+CONFIG(debug, debug|release) {
+    QMAKE_CXXFLAGS += -O0
+    DEFINES        += ARG_DEBUG
+    CONFIG         += console
+} else {
+    QMAKE_CXXFLAGS += -O3
+}
+
 DEFINES += USING_PCH
 #DEFINES += BOOST_ENABLE_ASSERT_HANDLER
 

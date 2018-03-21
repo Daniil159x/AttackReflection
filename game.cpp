@@ -4,8 +4,10 @@
 
 using namespace std::chrono_literals;
 
+
+
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
-                                                        "Attack Reflection"/*, sf::Style::Fullscreen*/)),
+                                                        "Attack Reflection", FULLSCREEN)),
     m_events(m_pWin), m_archerBowFrames(std::make_shared<std::vector<Animation::Frame_t>>()),
     m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delayFinish(std::chrono::duration_cast<duration_t>(5s))
 {

@@ -35,4 +35,10 @@ namespace Collision {
     bool PixelPerfectTest(const sf::Sprite& obj_1, const sf::Sprite& obj_2, sf::Uint8 AlphaLimit = 127);
 }
 
+#ifdef ARG_DEBUG
+    #define FULLSCREEN sf::Style::Default
+#else
+    #define FULLSCREEN sf::Style::Fullscreen
+#endif
+
 #endif // UTILITIES_HPP
