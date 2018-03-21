@@ -16,6 +16,7 @@ public:
 //    virtual void NextFrame() noexcept override;
     void Turn(float x, float y) noexcept;
 
+    sf::FloatRect GetGlobalBounds() const noexcept;
 
     virtual ~Zombie() noexcept override;
 protected:

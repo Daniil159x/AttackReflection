@@ -9,9 +9,9 @@ Zombie::Zombie() : Mob (100, 20, 100)
 void Zombie::Eats(Player &pl) noexcept
 {
     // TODO: что то сделать с анимацией еды
-    ApplyFrame_(m_frameEat);
     m_currFrame = m_frameEat;
-    pl.Damage(20);
+    ApplyFrame_(m_frameEat);
+    pl.Damage(0.1f);
 }
 
 void Zombie::StopEats() noexcept
@@ -38,12 +38,18 @@ void Zombie::Turn(float x, float y) noexcept
     }
 }
 
+sf::FloatRect Zombie::GetGlobalBounds() const noexcept
+{
+    return this->getTransform().transformRect(m_sprite.getLocalBounds());
+}
+
 Zombie::~Zombie() noexcept
 {}
 
 void Zombie::ApplyFrame_(size_t idx) noexcept
 {
     if(m_currFrame == m_frameEat || m_currFrame == m_frameDead){
+        m_currFrame = 0;
         return;
     }
     m_sprite.setTexture(*m_shFrames->at(idx).txr);

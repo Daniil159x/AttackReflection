@@ -74,7 +74,7 @@ int8_t Mob::GetHP() const noexcept
     return m_hp;
 }
 
-bool Mob::Damage(int8_t d) noexcept
+bool Mob::Damage(float d) noexcept
 {
     if(Alive() && (m_hp >= INT8_MIN + d))
     {

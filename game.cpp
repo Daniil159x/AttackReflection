@@ -165,11 +165,10 @@ void Game::ShowField() noexcept
     m_player.SetRotateBow(0);
 
 
-//    m_zombie.push_back({});
-//    m_zombie.back().SetSharedFrames(m_zombieFrames);
-//    m_zombie.back().SetSharedFrames(m_zombieFrames);
-//    m_zombie.back().SetFrameEats(m_zombieFrames->size() - 1);
-//    m_zombie.back().setPosition(1986, 770);
+    m_zombie.push_back({});
+    m_zombie.back().SetSharedFrames(m_zombieFrames);
+    m_zombie.back().SetFrameEats(m_zombieFrames->size() - 1);
+    m_zombie.back().setPosition(1986, 840);
 
     m_grass.setTexture(m_grassTexture, true);
     m_grass.setTextureRect({0, 0, win_w, m_grass.getTextureRect().height });
@@ -197,6 +196,7 @@ void Game::ShowField() noexcept
 template<>
 void Game::Update__<Game::InGame>() noexcept
 {
+
     auto dx = UpdateMoveBackground__();
     m_background[0].move(dx/6, 0);
     m_background[1].move(dx/3, 0);
@@ -252,20 +252,67 @@ void Game::Update__<Game::InGame>() noexcept
         }
     }
 
+//    static auto draw_point = [&](sf::Vector2f p, sf::Color c){
+//        sf::Vertex line1[2];
+//        line1[0].position = sf::Vector2f(p.x, 0);
+//        line1[0].color  = c;
+//        line1[1].position = sf::Vector2f(p.x, m_pWin->getSize().y);
+//        line1[1].color = c;
+
+//        sf::Vertex line2[2];
+//        line2[0].position = sf::Vector2f(0, p.y);
+//        line2[0].color  = c;
+//        line2[1].position = sf::Vector2f(m_pWin->getSize().x, p.y);
+//        line2[1].color = c;
+
+//        m_pWin->draw(line1, 2, sf::Lines);
+//        m_pWin->draw(line2, 2, sf::Lines);
+//    };
+
     // зомби
-    const auto &&cend = m_zombie.end();
-    for(auto &&it = m_zombie.begin(); it != cend;){
+    for(auto &&it = m_zombie.begin(); it != m_zombie.end();){
         if(it->Alive()){
-            it->Turn(1.f, 0);
+            // TODO: коллизия стрелы
+
+            const auto [x, y, w, h] = it->GetGlobalBounds();
+            const auto x_target = x + w/2;//, y_target = y + h;
+//            std::cout << x_target << " " << y_target << std::endl;
+//            draw_point({x_target, y_target}, sf::Color::Yellow);
+
+            const auto x_player = m_player.getPosition().x + 170;
+//            draw_point({x_player, 0}, sf::Color::Red);
+            if(x_player >= x_target){
+                it->Eats(m_player);
+                ++it;
+                continue;
+            }
+            const auto x_stairs_end = m_timbers.getPosition().x + 525;
+            const auto x_stairs_begin = m_timbers.getPosition().x + 280;
+//            draw_point({x_stairs_end, 0}, sf::Color::Blue);
+//            draw_point({x_stairs_begin, 0}, sf::Color::Green);
+            const float dx = -1;
+            if(x_stairs_begin <= x_target && x_target <= x_stairs_end){
+                it->Turn(dx, dx * 145.f / 206.f);
+            }
+//            else if(x_stairs_begin >= x_target){
+//                it->Turn(1, 0);
+//            }
+            else {
+                it->Turn(dx, 0);
+            }
         }
         else {
             if(it->NextLevel()){
                 it = m_zombie.erase(it);
-                continue;
             }
+            else {
+                ++it;
+            }
+            continue;
         }
         ++it;
     }
+
 
     if(!m_player.Alive()){
         m_stageGame = Finish;
@@ -276,7 +323,7 @@ template<>
 void Game::Update__<Game::Finish>() noexcept
 {
     // TODO: анимация конца
-    m_stageGame = Menu;
+    ShowMenu();
 }
 
 template<>

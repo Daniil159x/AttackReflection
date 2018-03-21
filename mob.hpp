@@ -49,12 +49,13 @@ public:
 
     void SetHP(int8_t hp) noexcept;
     int8_t GetHP() const noexcept;
-    bool Damage(int8_t d) noexcept;
+    bool Damage(float d) noexcept;
     bool Alive() const noexcept;
 
     virtual ~Mob() noexcept override;
 protected:
     int8_t m_hp;
+//    sf::RectangleShape m_
 
     virtual void Deaded() noexcept;
 };
