@@ -187,13 +187,10 @@ void Game::ShowField() noexcept
         }
     }, sf::Event::MouseButtonReleased);
 
-//    m_stageGame = Launch;
+    m_stageGame = Launch;
 
     m_buttons.back()->GetText().setPosition(1800, 30);
     m_buttons.back()->UpdateBackground({10, 10});
-
-
-    m_stageGame = InGame;
 }
 
 
@@ -205,25 +202,39 @@ void Game::Update__<Game::InGame>() noexcept
     m_background[1].move(dx/3, 0);
     m_background[2].move(dx/1, 0);
 
-    // игрок
+    // игрок    
     auto r = CalculateRotate(m_player.GetCenterBow(), sf::Vector2f(m_currPosCursor));
     m_player.SetRotateBow(r);
-    std::cout << r << std::endl;
+//    std::cout << r << std::endl;
 
     if(m_lastPressedLBtn != m_pressedLBtn){
-        if(m_pressedLBtn){
+        auto forse = m_player.GetTensionForce();
+        if(m_pressedLBtn && forse == 0){
             m_player.HoldBow();
         }
-        else {
-            auto forse = m_player.GetTensionForce();
-            // создать стрелу
+        else if(forse > 1){
+            const auto [x, y] = m_buttelTexture.getSize();
+            auto &&b = m_bullets.emplace_back(m_buttelTexture, sf::IntRect{0, 0, static_cast<int>(x), static_cast<int>(y)}, 50);
+            b.setPosition(m_player.GetCenterBow());
+            b.setRotation(m_player.GetRotateBow());
             m_player.Shot();
         }
         m_lastPressedLBtn = m_pressedLBtn;
     }
 
-
     // стрелы
+    const auto WinRect = sf::FloatRect{0, 0, static_cast<float>(m_pWin->getSize().x),
+                                             static_cast<float>(m_pWin->getSize().y) };
+    for(auto &&it = m_bullets.begin(); it != m_bullets.end();){
+        it->Tick(10);
+        if(!WinRect.contains(it->getPosition())){
+            it = m_bullets.erase(it);
+            std::cout << "erase" << std::endl;
+        }
+        else {
+            ++it;
+        }
+    }
 
     // зомби
     const auto &&cend = m_zombie.end();
@@ -240,18 +251,23 @@ void Game::Update__<Game::InGame>() noexcept
         ++it;
     }
 
+//    if(m_player.Alive()){
+//        m_stageGame = Finish;
+//    }
 }
 
 template<>
 void Game::Update__<Game::Finish>() noexcept
 {
     // TODO: анимация конца
+    m_stageGame = Menu;
 }
 
 template<>
 void Game::Update__<Game::Launch>() noexcept
 {
     // TODO: анимация начала
+    m_stageGame = InGame;
 }
 
 template<>
@@ -292,7 +308,7 @@ void Game::Render__<Game::InGame>() noexcept
     }
 
     // стрелы
-    for(auto && b : m_buttels){
+    for(auto && b : m_bullets){
         m_pWin->draw(b);
     }
 

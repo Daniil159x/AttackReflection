@@ -9,7 +9,7 @@ class Zombie : public Mob
 {
 public:
     Zombie();
-    void Eats(/*Player &pl*/) noexcept;
+    void Eats(Player &pl) noexcept;
     void StopEats(/*Player &pl*/) noexcept;
     void SetFrameEats(size_t idx) noexcept;
     void SetFrameDead(size_t idx) noexcept;
@@ -30,8 +30,6 @@ private:
 
     size_t m_frameEat = 100000;
     size_t m_frameDead = 100000;
-
-
 };
 
 #endif // ZOMBIE_HPP

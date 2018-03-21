@@ -11,10 +11,11 @@ public:
     Player();
     void SetTextureBody(sf::Texture const& tx, sf::IntRect const &rect) noexcept;
     void SetRotateBow(float r) noexcept;
+    float GetRotateBow() const noexcept;
     sf::Vector2f GetCenterBow() const noexcept;
     void Shot() noexcept;
     void SetFrameShot(size_t frameShot) noexcept;
-    void HoldBow() noexcept;
+    bool HoldBow() noexcept;
     void StopHoldBow() noexcept;
     int8_t GetTensionForce() const noexcept;
 

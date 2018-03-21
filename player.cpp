@@ -55,6 +55,11 @@ void Player::SetRotateBow(float r) noexcept
     }
 }
 
+float Player::GetRotateBow() const noexcept
+{
+    return m_bow.getRotation() + 18.2084f;
+}
+
 sf::Vector2f Player::GetCenterBow() const noexcept
 {
     return this->getPosition() + sf::Vector2f{127, 45};
@@ -78,10 +83,15 @@ void Player::SetFrameShot(size_t frameShot) noexcept
 
 int8_t Player::GetTensionForce() const noexcept
 {
-    // TODO: сделать для большего количества
     BOOST_ASSERT(m_shFrames->size() <= 127);
     const int8_t forse_one = std::numeric_limits<int8_t>::max() / m_shFrames->size();
-    return static_cast<int8_t>(m_currFrame) * forse_one;
+    if(m_currFrame < m_frameShot){
+        return static_cast<int8_t>(m_currFrame) * forse_one;
+    }
+    else {
+        auto r_idx = m_shFrames->size() - m_frameShot;
+        return static_cast<int8_t>(r_idx) * -forse_one;
+    }
 }
 
 void Player::NextFrame() noexcept
@@ -100,9 +110,10 @@ void Player::NextFrame() noexcept
     }
 }
 
-void Player::HoldBow() noexcept
+bool Player::HoldBow() noexcept
 {
     m_holdBowstring = true;
+    return m_holdBowstring;
 }
 
 void Player::StopHoldBow() noexcept

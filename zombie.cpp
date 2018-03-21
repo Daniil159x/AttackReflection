@@ -6,12 +6,12 @@
 Zombie::Zombie() : Mob (100, 20, 100)
 {}
 
-void Zombie::Eats() noexcept
+void Zombie::Eats(Player &pl) noexcept
 {
     // TODO: что то сделать с анимацией еды
     ApplyFrame_(m_frameEat);
     m_currFrame = m_frameEat;
-    // player->damage(...);
+    pl.Damage(20);
 }
 
 void Zombie::StopEats() noexcept

@@ -84,7 +84,7 @@ private:
     time_point_t m_timeLastZombie;
     // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
     std::deque<Zombie> m_zombie;
-    std::deque<Bullet> m_buttels;
+    std::deque<Bullet> m_bullets;
 
     template<stage_t st>
     void Update__() noexcept;

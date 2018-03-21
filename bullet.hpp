@@ -8,19 +8,19 @@
 class Bullet : public Disappearing, public sf::Sprite
 {
 public:
-    Bullet();
     Bullet(const sf::Texture& texture, const sf::IntRect& rectangle, uint8_t dmg, uint8_t lvls = 10);
 
-    // TODO: добавить физику
+    void Tick(float dx) noexcept;
 
     uint8_t GetDamage() const noexcept;
     void SetDamage(uint8_t damage) noexcept;
 
     virtual ~Bullet() noexcept override {}
 protected:
-    virtual void ApplyAlpha_(uint8_t alpha) noexcept;
+    virtual void ApplyAlpha_(uint8_t alpha) noexcept override;
 private:
     uint8_t m_damage;
+    uint    m_tick; // = time
 };
 
 #endif // BULLET_HPP

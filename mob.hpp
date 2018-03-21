@@ -47,9 +47,9 @@ class Mob : public Animation
 public:
     Mob(int8_t hp = 100, uint8_t callsOnFrame = 1, uint8_t lvls = 10);
 
-    inline void SetHP(int8_t hp) noexcept;
-    inline int8_t GetHP() const noexcept;
-    inline bool Damage(int8_t d) noexcept;
+    void SetHP(int8_t hp) noexcept;
+    int8_t GetHP() const noexcept;
+    bool Damage(int8_t d) noexcept;
     bool Alive() const noexcept;
 
     virtual ~Mob() noexcept override;
