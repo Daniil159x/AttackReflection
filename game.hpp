@@ -85,11 +85,15 @@ private:
     std::deque<Zombie> m_zombie;
     std::deque<Bullet> m_bullets;
 
+    duration_t       m_delayZombie;
+    time_point_t     m_lastTimeZombie;
+
     // end
     sf::Font m_font;
     sf::Text m_endText;
-    time_point_t     m_begin;
-    const duration_t m_delay;
+    time_point_t     m_startFinish;
+    const duration_t m_delayFinish;
+
 
     template<stage_t st>
     void Update__() noexcept;
@@ -102,6 +106,10 @@ private:
     float UpdateMoveBackground__() noexcept;
 
     void ClearWindow__() noexcept;
+
+    void CreateZombie__() noexcept;
+
+    void UpdateRandDelayZombie__() noexcept;
 };
 
 #endif // GAME_HPP

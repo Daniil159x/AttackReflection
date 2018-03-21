@@ -9,7 +9,7 @@ using namespace std::chrono_literals;
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
                                                         "Attack Reflection"/*, sf::Style::Fullscreen*/)),
     m_events(m_pWin), m_archerBowFrames(std::make_shared<std::vector<Animation::Frame_t>>()),
-    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delay(std::chrono::duration_cast<duration_t>(2s))
+    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delayFinish(std::chrono::duration_cast<duration_t>(2s))
 {
     m_pWin->setFramerateLimit(60);
 //    m_pWin->setVerticalSyncEnabled(true);
@@ -25,6 +25,9 @@ Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFulls
     auto [x_win, y_win] = m_pWin->getSize();
 
     m_endText.setPosition( x_win/2 - w/2, y_win/2 - h/2);
+
+    m_lastTimeZombie = clock_t::now();
+    UpdateRandDelayZombie__();
 }
 
 void Game::Init() noexcept
@@ -53,15 +56,7 @@ void Game::Init() noexcept
 
         m_currPosCursor.x = e.mouseMove.x;
         m_currPosCursor.y = e.mouseMove.y;
-//        std::cout << m_currPosCursor.x << " " << m_currPosCursor.y << std::endl;
     }, sf::Event::MouseMoved);
-
-//    m_events.ConnectCallback([&](sf::Event e){
-//        BOOST_ASSERT(e.type == sf::Event::TouchMoved);
-
-//        m_currPosCursor.x = e.touch.x;
-//        m_currPosCursor.y = e.touch.y;
-//    }, sf::Event::TouchMoved);
 
 
     // background
@@ -96,7 +91,6 @@ void Game::Init() noexcept
         Animation::AppendFrameToShared(m_zombieFrames, tmp, {0, 0, w, h});
     }
 
-//    BOOST_ASSERT( m_zombieTexture.loadFromFile(ROOT_PATH "Textures/Zombie/Zombie 1.png") );
     BOOST_ASSERT( m_bulletTexture.loadFromFile(ROOT_PATH "Textures/Archer/Arrow.png") );
 
     // map
@@ -174,15 +168,8 @@ void Game::ShowField() noexcept
                                                  static_cast<int>(m_archerBody.getSize().y)});
     m_player.SetSharedFrames(m_archerBowFrames);
     m_player.SetFrameShot(3);
-    m_player.setPosition(85, 630);
+    m_player.setPosition(30, 630);
     m_player.SetRotateBow(0);
-
-
-    m_zombie.push_back({});
-    m_zombie.back().SetSharedFrames(m_zombieFrames);
-    m_zombie.back().SetFrameEats(m_zombieFrames->size() - 1);
-    m_zombie.back().setPosition(1986, 840);
-    m_zombie.back().SetCallsOnFrame(15);
 
     m_grass.setTexture(m_grassTexture, true);
     m_grass.setTextureRect({0, 0, win_w, m_grass.getTextureRect().height });
@@ -232,6 +219,13 @@ void Game::Update__<Game::InGame>() noexcept
         m_player.Shot();
     }
 
+    const auto now = clock_t::now();
+    if((now - m_lastTimeZombie) >= m_delayZombie){
+        std::cout << "create: " << m_delayZombie.count() << "ns" << std::endl;
+        CreateZombie__();
+        UpdateRandDelayZombie__();
+        m_lastTimeZombie = now;
+    }
 
     // стрелы
     const auto WinRect = sf::FloatRect{0, 0, static_cast<float>(m_pWin->getSize().x),
@@ -264,7 +258,7 @@ void Game::Update__<Game::InGame>() noexcept
                 z.Damage(it->GetDamage());
                 break;
             }
-            std::cout << has << std::endl;
+//            std::cout << has << std::endl;
         }
 
         if(!WinRect.contains(it->getPosition())){
@@ -283,7 +277,7 @@ void Game::Update__<Game::InGame>() noexcept
             const auto [x, y, w, h] = it->GetGlobalBounds();
             const auto x_target = x + w/2;
 
-            const auto x_player = m_player.getPosition().x + 170;
+            const auto x_player = m_player.getPosition().x + 230;
             if(x_player >= x_target){
                 it->Eats(m_player);
                 ++it;
@@ -313,7 +307,7 @@ void Game::Update__<Game::InGame>() noexcept
 
 
     if(!m_player.Alive()){
-        m_begin     = clock_t::now();
+        m_startFinish     = clock_t::now();
         m_stageGame = Finish;
     }
 }
@@ -322,7 +316,7 @@ template<>
 void Game::Update__<Game::Finish>() noexcept
 {
     auto now = clock_t::now();
-    if((now - m_begin) >= m_delay){
+    if((now - m_startFinish) >= m_delayFinish){
         ShowMenu();
     }
 }
@@ -385,7 +379,6 @@ void Game::Render__<Game::Finish>() noexcept
 {
     Render__<InGame>();
     m_pWin->draw(m_endText);
-//    std::cout << m_endText.getPosition().x << " " << m_endText.getPosition().y << std::endl;
 }
 
 template<>
@@ -465,4 +458,23 @@ float Game::UpdateMoveBackground__() noexcept
 void Game::ClearWindow__() noexcept
 {
     m_pWin->clear(sf::Color::Cyan);
+}
+
+void Game::CreateZombie__() noexcept
+{
+    m_zombie.push_back({});
+    auto &&z = m_zombie.back();
+    z.SetSharedFrames(m_zombieFrames);
+    z.SetFrameEats(m_zombieFrames->size() - 1);
+    z.setPosition(1986, 840);
+    z.SetCallsOnFrame(15);
+}
+
+void Game::UpdateRandDelayZombie__() noexcept
+{
+    static std::mt19937 gen(static_cast<std::mt19937::result_type>(clock_t::now().time_since_epoch().count()));
+
+    static std::uniform_int_distribution<> dis(2, 10);
+
+    m_delayZombie = std::chrono::seconds(dis(gen));
 }
