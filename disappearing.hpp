@@ -10,8 +10,8 @@ class Disappearing
 public:
     Disappearing(uint8_t lvls = 1);
 
-    inline uint8_t GetLvls() const noexcept;
-    inline void SetLvls(uint8_t lvls = 1) noexcept;
+    uint8_t GetLvls() const noexcept;
+    void SetLvls(uint8_t lvls = 1) noexcept;
 
     virtual bool NextLevel() noexcept;
     void MinLevel() noexcept;
@@ -25,7 +25,7 @@ protected:
 private:
     uint8_t m_lvls = 1;
     uint8_t m_original = 255;
-    uint8_t m_currAlpha;
+    uint8_t m_currAlpha = 255;
 };
 
 #endif // DISAPPEARING_HPP

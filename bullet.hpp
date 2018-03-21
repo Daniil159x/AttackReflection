@@ -16,11 +16,15 @@ public:
     void SetDamage(uint8_t damage) noexcept;
 
     virtual ~Bullet() noexcept override {}
+    bool GetIsActive() const noexcept;
+    void SetIsActive(bool isActive) noexcept;
+
 protected:
     virtual void ApplyAlpha_(uint8_t alpha) noexcept override;
 private:
     uint8_t m_damage;
-    uint    m_tick; // = time
+    bool    m_isActive;
+//    uint    m_tick; // = time
 };
 
 #endif // BULLET_HPP

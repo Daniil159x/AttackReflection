@@ -67,7 +67,7 @@ sf::Vector2f Player::GetCenterBow() const noexcept
 
 void Player::Shot() noexcept
 {
-    BOOST_ASSERT(m_holdBowstring);
+    //BOOST_ASSERT(m_holdBowstring);
     StopHoldBow();
     m_currFrame = m_shFrames->size() - m_currFrame;
     if(m_currFrame >= m_shFrames->size()){
@@ -97,14 +97,14 @@ int8_t Player::GetTensionForce() const noexcept
 void Player::NextFrame() noexcept
 {
     if(CheckCalls()){
-        if(m_holdBowstring) {
-            if(m_currFrame + 1 >= m_frameShot){
-                return;
-            }
-            ++m_currFrame;
+        if(GetTensionForce() >= 0){
+            m_currFrame = (m_currFrame + 1) < m_frameShot ? m_currFrame + 1 : m_currFrame;
         }
-        else{
+        else if(GetTensionForce() < 0){
             m_currFrame = (m_currFrame + 1) % m_shFrames->size();
+        }
+        else {
+            return;
         }
         ApplyFrame_(m_currFrame);
     }

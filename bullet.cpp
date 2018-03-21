@@ -48,3 +48,13 @@ void Bullet::ApplyAlpha_(uint8_t alpha) noexcept
     c.a = alpha;
     this->setColor(c);
 }
+
+bool Bullet::GetIsActive() const noexcept
+{
+    return m_isActive;
+}
+
+void Bullet::SetIsActive(bool isActive) noexcept
+{
+    m_isActive = isActive;
+}

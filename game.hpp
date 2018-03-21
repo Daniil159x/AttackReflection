@@ -66,13 +66,12 @@ private:
     // game loop
     Player m_player;
     bool   m_pressedLBtn     = false;
-    bool   m_lastPressedLBtn = false;
 //    bool   m_hasShot     = false;
     //      active
     Animation::SharedFrames m_archerBowFrames;
     sf::Texture             m_archerBody;
     Animation::SharedFrames m_zombieFrames;
-    sf::Texture m_buttelTexture;
+    sf::Texture m_bulletTexture;
     //      map
     sf::Texture m_pathTexture;
     sf::Texture m_grassTexture;

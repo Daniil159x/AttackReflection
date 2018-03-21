@@ -84,7 +84,7 @@ void Game::Init() noexcept
     }
 
 //    BOOST_ASSERT( m_zombieTexture.loadFromFile(ROOT_PATH "Textures/Zombie/Zombie 1.png") );
-    BOOST_ASSERT( m_buttelTexture.loadFromFile(ROOT_PATH "Textures/Archer/Arrow.png") );
+    BOOST_ASSERT( m_bulletTexture.loadFromFile(ROOT_PATH "Textures/Archer/Arrow.png") );
 
     // map
     BOOST_ASSERT( m_pathTexture.loadFromFile(ROOT_PATH "Textures/Forest/Path.png") );
@@ -205,31 +205,47 @@ void Game::Update__<Game::InGame>() noexcept
     // игрок    
     auto r = CalculateRotate(m_player.GetCenterBow(), sf::Vector2f(m_currPosCursor));
     m_player.SetRotateBow(r);
-//    std::cout << r << std::endl;
 
-    if(m_lastPressedLBtn != m_pressedLBtn){
-        auto forse = m_player.GetTensionForce();
-        if(m_pressedLBtn && forse == 0){
-            m_player.HoldBow();
-        }
-        else if(forse > 1){
-            const auto [x, y] = m_buttelTexture.getSize();
-            auto &&b = m_bullets.emplace_back(m_buttelTexture, sf::IntRect{0, 0, static_cast<int>(x), static_cast<int>(y)}, 50);
-            b.setPosition(m_player.GetCenterBow());
-            b.setRotation(m_player.GetRotateBow());
-            m_player.Shot();
-        }
-        m_lastPressedLBtn = m_pressedLBtn;
+    auto forse = m_player.GetTensionForce();
+    if(forse > 1 && !m_pressedLBtn){
+        const auto [x, y] = m_bulletTexture.getSize();
+        auto &&b = m_bullets.emplace_back(m_bulletTexture, sf::IntRect{0, 0, static_cast<int>(x), static_cast<int>(y)}, 50);
+        b.setPosition(m_player.GetCenterBow());
+        b.setRotation(m_player.GetRotateBow());
+        b.SetLvls(100);
+        b.SetIsActive(true);
+        m_player.Shot();
     }
+
 
     // стрелы
     const auto WinRect = sf::FloatRect{0, 0, static_cast<float>(m_pWin->getSize().x),
                                              static_cast<float>(m_pWin->getSize().y) };
-    for(auto &&it = m_bullets.begin(); it != m_bullets.end();){
+    for(auto &&it = m_bullets.begin(); it != m_bullets.end();){        
+        const auto [w, h] = m_bulletTexture.getSize();
+        const auto tip    = it->getTransform().transformPoint(w, h/2);
+        const auto line_y   = m_path.getPosition().y + m_pathTexture.getSize().y / 2;
+
+        std::cout << line_y << " " << tip.y << std::endl;
+        if( tip.y >= line_y ){
+            it->SetIsActive(false);
+        }
+
+        std::cout << "active: " << it->GetIsActive() << std::endl;
+        if(!it->GetIsActive()){
+            if(it->NextLevel()){
+                it = m_bullets.erase(it);
+            }
+            else{
+                ++it;
+            }
+            continue;
+        }
+
         it->Tick(10);
+
         if(!WinRect.contains(it->getPosition())){
             it = m_bullets.erase(it);
-            std::cout << "erase" << std::endl;
         }
         else {
             ++it;
@@ -251,9 +267,9 @@ void Game::Update__<Game::InGame>() noexcept
         ++it;
     }
 
-//    if(m_player.Alive()){
-//        m_stageGame = Finish;
-//    }
+    if(!m_player.Alive()){
+        m_stageGame = Finish;
+    }
 }
 
 template<>
@@ -351,7 +367,6 @@ void Game::Display() noexcept
         return;
     }
 
-    // TODO: так как отображение меню тоже нужно рендерить, поэтому можно в Update__ менять логику действий
     std::thread([&](){
         while(m_pWin->isOpen() && m_stageGame != Nope){
 
