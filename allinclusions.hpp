@@ -16,6 +16,8 @@
 /// precompiled file
 #include "extinclusions.hpp"
 
+#define ROOT_PATH "../../"
+
 /// headers project
 #include "utilities.hpp"
 

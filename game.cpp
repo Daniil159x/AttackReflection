@@ -2,24 +2,22 @@
 
 #include "allinclusions.hpp"
 
-#define ROOT_PATH "../../"
-
 using namespace std::chrono_literals;
 
 Game::Game() : m_pWin(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
                                                         "Attack Reflection"/*, sf::Style::Fullscreen*/)),
     m_events(m_pWin), m_archerBowFrames(std::make_shared<std::vector<Animation::Frame_t>>()),
-    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delayFinish(std::chrono::duration_cast<duration_t>(2s))
+    m_zombieFrames(std::make_shared<std::vector<Animation::Frame_t>>()), m_delayFinish(std::chrono::duration_cast<duration_t>(5s))
 {
     m_pWin->setFramerateLimit(60);
 //    m_pWin->setVerticalSyncEnabled(true);
     m_pWin->setKeyRepeatEnabled(false);
 
-
-    m_font.loadFromFile(ROOT_PATH "Fonts/486.ttf");
-    m_endText.setFont(m_font);
+    m_endText.setFont(Button::GlobalFont);
     m_endText.setString("GAME OVER");
-    m_endText.setCharacterSize(50);
+    m_endText.setCharacterSize(100);
+    m_endText.setFillColor(sf::Color::Red);
+    m_endText.setStyle(sf::Text::Regular);
 
     auto [x, y, w, h]   = m_endText.getLocalBounds();
     auto [x_win, y_win] = m_pWin->getSize();
@@ -221,7 +219,7 @@ void Game::Update__<Game::InGame>() noexcept
 
     const auto now = clock_t::now();
     if((now - m_lastTimeZombie) >= m_delayZombie){
-        std::cout << "create: " << m_delayZombie.count() << "ns" << std::endl;
+//        std::cout << "create: " << m_delayZombie.count() << "ns" << std::endl;
         CreateZombie__();
         UpdateRandDelayZombie__();
         m_lastTimeZombie = now;
@@ -252,13 +250,11 @@ void Game::Update__<Game::InGame>() noexcept
 
         // коллизии
         for(auto &&z : m_zombie){
-            bool has = z.IsCollision(tip);
-            if(has){
+            if(z.Alive() && z.IsCollision(tip)){
                 it->SetActive(false);
                 z.Damage(it->GetDamage());
                 break;
             }
-//            std::cout << has << std::endl;
         }
 
         if(!WinRect.contains(it->getPosition())){
@@ -277,7 +273,7 @@ void Game::Update__<Game::InGame>() noexcept
             const auto [x, y, w, h] = it->GetGlobalBounds();
             const auto x_target = x + w/2;
 
-            const auto x_player = m_player.getPosition().x + 230;
+            const auto x_player = m_player.getPosition().x + 270;
             if(x_player >= x_target){
                 it->Eats(m_player);
                 ++it;
@@ -307,8 +303,8 @@ void Game::Update__<Game::InGame>() noexcept
 
 
     if(!m_player.Alive()){
-        m_startFinish     = clock_t::now();
-        m_stageGame = Finish;
+        m_startFinish = clock_t::now();
+        m_stageGame   = Finish;
     }
 }
 
@@ -379,6 +375,8 @@ void Game::Render__<Game::Finish>() noexcept
 {
     Render__<InGame>();
     m_pWin->draw(m_endText);
+    auto [x, y, w, h] = m_endText.getGlobalBounds();
+//    std::cout << x << " " << y << " " << w << " " << h << std::endl;
 }
 
 template<>

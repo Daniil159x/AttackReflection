@@ -84,7 +84,6 @@ void EventController::StartListeningSync() noexcept
         sf::Event ev;
         uint8_t repeatErrors = 0;
         while(m_pWin->isOpen() && m_isRun){
-            // TODO: приложение остановится не сразу, так как должно наступить какое то событие
             // TODO: приделать проверку зажатий клавиш
             if(m_pWin->waitEvent(ev) && m_isRun){
 //                auto now = std::chrono::system_clock::now();
@@ -143,10 +142,9 @@ void EventController::StartListeningSync() noexcept
             else {
                 ++repeatErrors;
                 if(repeatErrors >= 10){
-                    sf::err() << "EventController loop ended with errors" << std::endl;
+                    sf::err() << "EventController: more than 10 errors detected - thread completion" << std::endl;
                     break;
                 }
-                // TODO: error log
             }
         }
 

@@ -62,7 +62,6 @@ private:
     // menu
     std::array<Button_ptr, 3> m_buttons;
 
-    // TODO: что то сделать с текстурами
     // game loop
     Player m_player;
     bool   m_pressedLBtn     = false;
@@ -81,7 +80,7 @@ private:
     sf::Sprite  m_timbers;
 
     time_point_t m_timeLastZombie;
-    // TODO: опредлиться с контейнером, пока подходит только deque и лист, хотя и unordered_set
+
     std::deque<Zombie> m_zombie;
     std::deque<Bullet> m_bullets;
 

@@ -20,7 +20,7 @@ sf::Text &Button::GetText() noexcept
 
 void Button::GlobalFontInit()
 {
-    GlobalFont.loadFromFile("/home/daniil/.config/fontconfig/Anonymous Pro BI.ttf");
+    GlobalFont.loadFromFile(ROOT_PATH "Fonts/11602.ttf");
 }
 
 void Button::UpdateBackground(sf::Vector2f padding) noexcept
@@ -40,7 +40,6 @@ void Button::UpdateBackground(sf::Vector2f padding) noexcept
 
 void Button::UpdateText(sf::Vector2f padding) noexcept
 {
-    // TODO: сделать поворот
 }
 
 sf::FloatRect Button::getGlobalBounds() const noexcept
